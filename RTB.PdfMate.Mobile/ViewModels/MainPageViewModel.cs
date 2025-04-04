@@ -31,7 +31,7 @@ public class MainPageViewModel : ObservableObject
 
         foreach (var file in result)
         {
-            var inputDocument = PdfReader.Open(file.FullPath, PdfDocumentOpenMode.Import);
+            var inputDocument = PdfReader.Open(file.FullPath, PdfDocumentOpenMode.ReadOnly);
             if (inputDocument != null)
                 LoadedDocuments.Add(inputDocument);
         }
