@@ -6,7 +6,10 @@
 			 x:DataType="{x:Type vm:MainPageViewModel}"
              x:Class="RTB.PdfMate.Mobile.MainPage">
     <Grid RowDefinitions="Auto, Auto, *" Padding="10">
-        <Label Grid.Row="0" Text="Files:" FontSize="Header" />
+        <Grid ColumnDefinitions="Auto, *, Auto">
+            <Label Grid.Column="0" Text="Files:" FontSize="Header" />
+            <Button Grid.Column="2" VerticalOptions="Center" Command="{Binding OpenFileExplorerCommand}" HorizontalOptions="Center" Text="Import Files" />
+        </Grid>
         <HorizontalStackLayout Grid.Row="1" HeightRequest="120">
             <CollectionView 
                 ItemsSource="{Binding LoadedDocuments}"
@@ -23,14 +26,5 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </HorizontalStackLayout>
-        <Border Grid.Row="2" Margin="10" Stroke="Red" StrokeDashArray="5,8" StrokeThickness="3">
-            <Border.GestureRecognizers>
-               <DropGestureRecognizer 
-                AllowDrop="True"
-                DragOver="DropGestureRecognizer_DragOver"
-                Drop="DropGestureRecognizer_Drop" /> 
-            </Border.GestureRecognizers>
-            <Button VerticalOptions="Center" HorizontalOptions="Center" Text="Drop Files Here or click to open" />
-        </Border>
     </Grid>
 </ContentPage>
