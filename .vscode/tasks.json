@@ -1,0 +1,79 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+          "build",
+          "${workspaceFolder}/RTB.PdfMate.Web/RTB.PdfMate.Web.csproj",
+          "/property:GenerateFullPaths=true",
+          "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+        "label": "publish",
+        "command": "dotnet",
+        "type": "process",
+        "args": [
+            "publish",
+            "${workspaceFolder}/RTB.PdfMate.Web/RTB.PdfMate.Web.csproj",
+            "/property:GenerateFullPaths=true",
+            "/consoleloggerparameters:NoSummary"
+        ],
+        "problemMatcher": "$msCompile"
+    },
+    {
+        "label": "watch",
+        "command": "dotnet",
+        "type": "process",
+        "args": [
+            "watch",
+            "run",
+            "${workspaceFolder}/RTB.PdfMate.Web/RTB.PdfMate.Web.csproj",
+            "/property:GenerateFullPaths=true",
+            "/consoleloggerparameters:NoSummary"
+        ],
+        "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Run Tailwind Watch",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/RTB.PdfMate.Web"
+      },
+      "command": ".\\Tailwind\\tailwindcss-windows-x64.exe",
+      "args": [
+        "-i",
+        "wwwroot/css/tailwind-input.css",
+        "-o",
+        "wwwroot/css/tailwind-min.css",
+        "--watch"
+      ],
+      "isBackground": true,
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "silent",
+        "panel": "dedicated",
+        "echo": true,
+        "clear": true
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "solution",
+      "type": "pickString",
+      "description": "Select the solution to build",
+      "options": [
+        "RTB.PdfMate.Web",
+        "RTB.PdfMate.Mobile"
+      ]
+    }
+  ]
+}
