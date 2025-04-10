@@ -44,7 +44,7 @@
       "options": {
         "cwd": "${workspaceFolder}/RTB.PdfMate.Web"
       },
-      "command": ".\\Tailwind\\tailwindcss-windows-x64.exe",
+      "command": "./Tailwind/tailwindcss",
       "args": [
         "-i",
         "wwwroot/css/tailwind-input.css",
@@ -52,6 +52,7 @@
         "wwwroot/css/tailwind-min.css",
         "--watch"
       ],
+      "problemMatcher": [],
       "isBackground": true,
       "group": {
         "kind": "build",
@@ -63,6 +64,33 @@
         "echo": true,
         "clear": true
       }
+    },
+    {
+      "label": "Kill Port",
+      "type": "shell",
+      "command": "lsof",
+      "args": [
+        "-ti",
+        ":5217"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "echo": true
+      },
+      "group": {
+        "kind": "none",
+        "isDefault": false
+      },
+      "dependsOn": [
+        {
+          "label": "Kill Process",
+          "type": "shell",
+          "command": "kill",
+          "args": ["-9", "$(lsof -ti :5217)"]
+        }
+      ]
     }
   ],
   "inputs": [

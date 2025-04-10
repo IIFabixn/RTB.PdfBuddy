@@ -20,11 +20,11 @@
   </ItemGroup>
 
   <Target Name="MinifyTailwindCss" AfterTargets="Build" BeforeTargets="Publish" Condition="'$(Configuration)' == 'Release'">
-    <Exec Command="Tailwind/tailwindcss-windows-x64.exe -i wwwroot/css/tailwind-input.css -o wwwroot/css/tailwind-min.css --minify" />
+    <Exec Command="Tailwind/tailwindcss -i wwwroot/css/tailwind-input.css -o wwwroot/css/tailwind-min.css --minify" />
   </Target>
 
   <Target Name="CompileTailwindCss" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
-    <Exec Command=".\Tailwind\tailwindcss-windows-x64.exe -i wwwroot/css/tailwind-input.css -o wwwroot/css/tailwind-min.css" />
+    <Exec Command=".\Tailwind\tailwindcss -i wwwroot/css/tailwind-input.css -o wwwroot/css/tailwind-min.css" />
   </Target>
 
   <ItemGroup>

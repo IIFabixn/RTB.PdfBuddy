@@ -27,7 +27,6 @@
           "type": "blazorwasm",
           "request": "attach",
           "cwd": "${workspaceFolder}/RTB.PdfMate.Web",
-          "browser": "edge",
           "url": "http://localhost:5217",  // Tell launch where to find site
           "timeout": 120000, // Allows time for the site to launch
       }
@@ -35,7 +34,7 @@
   "compounds": [
       {
           "name": "Debug with Hot Reload",
-          "preLaunchTask": "Run Tailwind Watch",
+          "preLaunchTask": "Kill Port",
           "configurations": [ "Watch", "Attach" ],
       }
   ]
