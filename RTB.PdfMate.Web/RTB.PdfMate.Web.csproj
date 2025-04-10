@@ -24,7 +24,7 @@
   </Target>
 
   <Target Name="CompileTailwindCss" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
-    <Exec Command=".\Tailwind\tailwindcss -i wwwroot/css/tailwind-input.css -o wwwroot/css/tailwind-min.css" />
+    <Exec Command="npx tailwindcss -i wwwroot/css/tailwind-input.css -o wwwroot/css/tailwind.min.css" />
   </Target>
 
   <ItemGroup>

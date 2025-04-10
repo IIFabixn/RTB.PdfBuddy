@@ -66,12 +66,12 @@
       }
     },
     {
-      "label": "Kill Port",
+      "label": "Kill Port 5217",
       "type": "shell",
-      "command": "lsof",
+      "command": "bash",
       "args": [
-        "-ti",
-        ":5217"
+        "-c",
+        "lsof -ti :5217 | xargs kill -9"
       ],
       "problemMatcher": [],
       "presentation": {
@@ -82,26 +82,7 @@
       "group": {
         "kind": "none",
         "isDefault": false
-      },
-      "dependsOn": [
-        {
-          "label": "Kill Process",
-          "type": "shell",
-          "command": "kill",
-          "args": ["-9", "$(lsof -ti :5217)"]
-        }
-      ]
-    }
-  ],
-  "inputs": [
-    {
-      "id": "solution",
-      "type": "pickString",
-      "description": "Select the solution to build",
-      "options": [
-        "RTB.PdfMate.Web",
-        "RTB.PdfMate.Mobile"
-      ]
+      }
     }
   ]
 }
