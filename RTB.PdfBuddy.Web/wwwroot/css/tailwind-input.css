@@ -1,1 +1,6 @@
 @import "tailwindcss" source("../../../");
+
+@source "**/*.razor"
+@source "**/*.html"
+@source "**/*.css"
+@source "**/*.cs"

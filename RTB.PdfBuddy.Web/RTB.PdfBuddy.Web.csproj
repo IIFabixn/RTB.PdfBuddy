@@ -20,7 +20,7 @@
     <Folder Include="Components\" />
   </ItemGroup>
 
-  <Target Name="MinifyTailwindCss" AfterTargets="Build" BeforeTargets="Publish" Condition="'$(Configuration)' == 'Release'">
+  <Target Name="MinifyTailwindCss" AfterTargets="Publish" Condition="'$(Configuration)' == 'Release'">
     <Exec Command="npx @tailwindcss/cli -i wwwroot/css/tailwind-input.css -o wwwroot/css/tailwind.min.css --minify" />
   </Target>
 
