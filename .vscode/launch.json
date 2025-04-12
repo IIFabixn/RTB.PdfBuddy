@@ -20,7 +20,7 @@
               ".",
               "--verbose" // Let's us confirm browser connects with hot reload capabilities
           ],
-          "preLaunchTask": "build" // Ensure we don't watch an unbuilt site
+          "preLaunchTask": "build web" // Ensure we don't watch an unbuilt site
       },
       {
           "name": "Attach",
