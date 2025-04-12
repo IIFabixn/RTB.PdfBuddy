@@ -1,0 +1,44 @@
+﻿@code {
+    [Parameter] public string ColumnDefinitions {get;set;} = "1fr";
+    [Parameter] public string RowDefinitions {get;set;} = "1fr";
+    [Parameter] public RenderFragment ChildContent {get;set;} = default!;
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object?> CapturedAttributes {get;set;} = new();
+}
+
+<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+<div class="grid @(CapturedAttributes.TryGetValue("class", out var classes) ? classes : string.Empty)"
+    style="grid-template-columns: @(string.Join(" ", ColumnDefinitions.Split(',').Select(c => c.Trim()))); grid-template-rows: @(string.Join(" ", RowDefinitions.Split(',').Select(r => r.Trim())));"
+    @attributes="@(CapturedAttributes.Where(kvp => kvp.Key != "class"))">
+    @foreach(var item in _gridItems)
+    {
+        <div class="@(item.CapturesAttributes.TryGetValue("class", out var itemClasses) ? itemClasses : string.Empty)" style="grid-column: @item.Column; grid-row: @item.Row; column-span: @item.ColumnSpan; row-span: @item.RowSpan">
+            @item.ChildContent
+        </div>
+    }
+</div>
+
+@code {
+    private List<GridItem> _gridItems = new();
+
+    public void RegisterItem(GridItem item)
+    {
+        if (!_gridItems.Contains(item))
+        {
+            _gridItems.Add(item);
+            StateHasChanged();
+        }
+    }
+
+    public void UnregisterItem(GridItem item)
+    {
+        if (_gridItems.Contains(item))
+        {
+            _gridItems.Remove(item);
+            StateHasChanged();
+        }
+    }
+}

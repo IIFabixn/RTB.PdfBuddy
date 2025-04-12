@@ -482,5 +482,5 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
-RTB.PdfMate.Web/Tailwind
-RTB.PdfMate.Web/wwwroot/css/tailwind.min.css
+RTB.PdfBuddy.Web/Tailwind
+RTB.PdfBuddy.Web/wwwroot/css/tailwind.min.css

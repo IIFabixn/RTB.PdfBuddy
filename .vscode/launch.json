@@ -5,14 +5,14 @@
           "name": "Launch and Debug Standalone Blazor WebAssembly App",
           "type": "blazorwasm",
           "request": "launch",
-          "cwd": "${workspaceFolder}/RTB.PdfMate.Web",
+          "cwd": "${workspaceFolder}/RTB.PdfBuddy.Web",
           "url": "http://localhost:5217" // Tell launch where to find site
       },
       {
           "name": "Watch",
           "type": "coreclr",
           "request": "launch",
-          "cwd": "${workspaceFolder}/RTB.PdfMate.Web",
+          "cwd": "${workspaceFolder}/RTB.PdfBuddy.Web",
           "program": "dotnet",
           "args": [
               "watch",
@@ -26,7 +26,7 @@
           "name": "Attach",
           "type": "blazorwasm",
           "request": "attach",
-          "cwd": "${workspaceFolder}/RTB.PdfMate.Web",
+          "cwd": "${workspaceFolder}/RTB.PdfBuddy.Web",
           "url": "http://localhost:5217",  // Tell launch where to find site
           "timeout": 120000, // Allows time for the site to launch
       }

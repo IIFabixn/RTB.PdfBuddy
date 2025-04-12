@@ -7,7 +7,7 @@
       "type": "process",
       "args": [
           "build",
-          "${workspaceFolder}/RTB.PdfMate.Web/RTB.PdfMate.Web.csproj",
+          "${workspaceFolder}/RTB.PdfBuddy.Web/RTB.PdfBuddy.Web.csproj",
           "/property:GenerateFullPaths=true",
           "/consoleloggerparameters:NoSummary"
       ],
@@ -19,7 +19,7 @@
         "type": "process",
         "args": [
             "publish",
-            "${workspaceFolder}/RTB.PdfMate.Web/RTB.PdfMate.Web.csproj",
+            "${workspaceFolder}/RTB.PdfBuddy.Web/RTB.PdfBuddy.Web.csproj",
             "/property:GenerateFullPaths=true",
             "/consoleloggerparameters:NoSummary"
         ],
@@ -32,7 +32,7 @@
         "args": [
             "watch",
             "run",
-            "${workspaceFolder}/RTB.PdfMate.Web/RTB.PdfMate.Web.csproj",
+            "${workspaceFolder}/RTB.PdfBuddy.Web/RTB.PdfBuddy.Web.csproj",
             "/property:GenerateFullPaths=true",
             "/consoleloggerparameters:NoSummary"
         ],
@@ -42,7 +42,7 @@
       "label": "Run Tailwind Watch",
       "type": "shell",
       "options": {
-        "cwd": "${workspaceFolder}/RTB.PdfMate.Web"
+        "cwd": "${workspaceFolder}/RTB.PdfBuddy.Web"
       },
       "command": "./Tailwind/tailwindcss",
       "args": [
