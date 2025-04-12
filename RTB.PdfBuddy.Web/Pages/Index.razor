@@ -1,6 +1,6 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Components.Forms
-
+@inject IJSRuntime JSRuntime
 <Grid Columns="2fr 1fr" Rows="1fr">
     <GridItem>
         <FlexLayout IsVertical>
@@ -19,31 +19,31 @@
         </FlexLayout>
     </GridItem>
     <GridItem Column="2">
-        <label class="h-full rounded flex flex-col" for="fileInput" ondrop="event.stopPropagation();">
-            <Grid Rows="50% 50%" class="bg-gray-50 rounded border-2 border-white justify-between">
-                <GridItem class="content-center p-4">
-                    <h2 class="text-center">Drag and drop your PDF files here or click to select files.</h2>
-                    <InputFile OnChange="LoadFiles" id="fileInput" multiple hidden />
+            <Grid Rows="50% 50%" class="rounded justify-between gap-4">
+                <GridItem class="content-center p-4 border-2 border-white">
+                    <DropArea Id="IndexFileDrop"
+                        OnFileSelected="LoadFiles"
+                        class="h-full rounded flex flex-col justify-center">
+                        <h2 class="text-center">Drag and drop your PDF files here or click to select files.</h2>
+                    </DropArea>
                 </GridItem>
                 <GridItem Row="2" class="overflow-y-auto content-end">
                     <CollectionList IsVertical
                                     TItem="string"
                                     Items="_files"
-                                    class="*:border-t *:first:border-0"
-                                    onclick="event.stopPropagation();">
+                                    class="*:border-t *:first:border-0">
                         <ItemTemplate>
                             <FlexLayout Element="li" IsHorizontal class="gap-2 items-center justify-between p-2 border-gray-300">
                                 <h4 class="text-nowrap overflow-hidden text-ellipsis" title="@context">@context</h4>
                                 <button type="button"
                                         class="text-red-500 self-end shrink-0"
-                                        @onclick="@(() => RemoveFile(@context))"
+                                        @onclick="@(() => RemoveFile(context))"
                                         >Remove</button>
                             </FlexLayout>
                         </ItemTemplate>
                     </CollectionList>
                 </GridItem>
             </Grid>
-        </label>
     </GridItem>
 </Grid>
 
