@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../RTB.PdfMate.Shared/RTB.PdfMate.Shared.csproj" />
+    <ProjectReference Include="..\Libraries\RTB.BlazorUI\RTB.BlazorUI.csproj" />
   </ItemGroup>
 
   <ItemGroup>
