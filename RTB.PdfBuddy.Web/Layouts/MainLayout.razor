@@ -1,8 +1,15 @@
-﻿@using RTB.PdfBuddy.Web.Components
-@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase
 
-<Grid ColumnDefinitions="20px, 3fr, 20px" class="gap-4 p-4 bg-gray-100 h-full">
-    <GridItem Column="2">
-        @Body
-    </GridItem>
-</Grid>
+<FlexLayout IsVertical class="page flex flex-col">
+    <nav class="flex flex-row justify-between w-full p-4">
+        <h1><NavLink href="">Refused to Brew - PdfBuddy</NavLink></h1>
+        <ul class="flex flex-row gap-4">
+            <li class="hover:text-slate-400"><NavLink href="infos"><Icon /> Infos</NavLink></li>
+        </ul>
+    </nav>
+    <Grid ColumnDefinitions="20px, 3fr, 20px" class="gap-4 p-4 bg-gray-100 h-full">
+        <GridItem Column="2">
+            @Body
+        </GridItem>
+    </Grid>
+</FlexLayout>
