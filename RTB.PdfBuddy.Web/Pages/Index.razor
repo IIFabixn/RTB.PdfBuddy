@@ -1,1 +1,51 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Components.Forms
+
+<Grid Columns="2fr 1fr" Rows="1fr">
+    <GridItem>
+        <FlexLayout IsVertical>
+            <FlexLayout IsVertical>
+                <h1>Welcome to PdfBuddy!</h1>
+                <p>PdfBuddy is a simple PDF editor that allows you to manipulate PDF files with ease, just by drag and drop!</p>
+            </FlexLayout>
+
+            <FlexLayout IsVertical>
+                <h2>Features</h2>
+                <ul>
+                    <li>Merge multiple PDFs into one</li>
+                    <li>Split a PDF into multiple files</li>
+                </ul>
+            </FlexLayout>
+        </FlexLayout>
+    </GridItem>
+    <GridItem Column="2" class="overflow-auto">
+        <FlexLayout FullHeight IsVertical class="min-h-1/2 bg-gray-50 p-4 rounded border-2 border-white">
+            <label class="h-full" for="fileInput" @ondrop:preventDefault>
+                <FlexLayout FullHeight IsVertical class="items-center justify-center">
+                    <h2 class="text-center">Drag and drop your PDF files here or click to select files.</h2>
+                    <InputFile OnChange="LoadFiles" @ondrop:preventDefault id="fileInput" multiple hidden />
+                </FlexLayout>
+            </label>
+        </FlexLayout>
+    </GridItem>
+</Grid>
+
+@code {
+    private List<string> _files = new List<string>();
+
+    private void LoadFiles(InputFileChangeEventArgs args)
+    {
+        var files = args.GetMultipleFiles();
+        foreach (var file in files)
+        {
+            var fileName = file.Name;
+            _files.Add(fileName);
+        }
+    }
+
+    private void RemoveFile(string fileName)
+    {
+        if (_files.Contains(fileName))
+            _files.Remove(fileName);
+    }
+}
