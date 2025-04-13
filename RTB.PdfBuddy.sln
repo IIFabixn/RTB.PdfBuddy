@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RTB.BlazorUI", "Libraries\RTB.BlazorUI\RTB.BlazorUI.csproj", "{04C5C90F-3C4E-406D-9278-0A8E8548572B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RTB.MauiUI", "Libraries\RTB.MauiUI\RTB.MauiUI.csproj", "{C2158005-8D96-4F86-81A7-F36EE6E31155}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,11 +73,24 @@ Global
 		{04C5C90F-3C4E-406D-9278-0A8E8548572B}.Release|x64.Build.0 = Release|Any CPU
 		{04C5C90F-3C4E-406D-9278-0A8E8548572B}.Release|x86.ActiveCfg = Release|Any CPU
 		{04C5C90F-3C4E-406D-9278-0A8E8548572B}.Release|x86.Build.0 = Release|Any CPU
+		{C2158005-8D96-4F86-81A7-F36EE6E31155}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2158005-8D96-4F86-81A7-F36EE6E31155}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2158005-8D96-4F86-81A7-F36EE6E31155}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C2158005-8D96-4F86-81A7-F36EE6E31155}.Debug|x64.Build.0 = Debug|Any CPU
+		{C2158005-8D96-4F86-81A7-F36EE6E31155}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C2158005-8D96-4F86-81A7-F36EE6E31155}.Debug|x86.Build.0 = Debug|Any CPU
+		{C2158005-8D96-4F86-81A7-F36EE6E31155}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2158005-8D96-4F86-81A7-F36EE6E31155}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2158005-8D96-4F86-81A7-F36EE6E31155}.Release|x64.ActiveCfg = Release|Any CPU
+		{C2158005-8D96-4F86-81A7-F36EE6E31155}.Release|x64.Build.0 = Release|Any CPU
+		{C2158005-8D96-4F86-81A7-F36EE6E31155}.Release|x86.ActiveCfg = Release|Any CPU
+		{C2158005-8D96-4F86-81A7-F36EE6E31155}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{04C5C90F-3C4E-406D-9278-0A8E8548572B} = {F2E35B3E-9711-EDEC-6202-DB40BDEED14A}
+		{C2158005-8D96-4F86-81A7-F36EE6E31155} = {F2E35B3E-9711-EDEC-6202-DB40BDEED14A}
 	EndGlobalSection
 EndGlobal

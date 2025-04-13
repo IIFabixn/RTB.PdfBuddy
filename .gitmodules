@@ -1,3 +1,6 @@
 [submodule "Libraries/RTB.BlazorUI"]
 	path = Libraries/RTB.BlazorUI
 	url = https://github.com/IIFabixn/RTB.BlazorUI.git
+[submodule "Libraries/RTB.MauiUI"]
+	path = Libraries/RTB.MauiUI
+	url = https://github.com/IIFabixn/RTB.MauiUI.git

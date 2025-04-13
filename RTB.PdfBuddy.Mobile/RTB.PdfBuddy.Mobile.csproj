@@ -65,6 +65,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="../Libraries/RTB.MauiUI/RTB.MauiUI.csproj" />
 	  <ProjectReference Include="../RTB.PdfBuddy.Shared/RTB.PdfBuddy.Shared.csproj" />
 	</ItemGroup>
 
