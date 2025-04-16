@@ -34,6 +34,7 @@
   "compounds": [
       {
           "name": "Debug with Hot Reload",
+          "preLaunchTask": "Kill Port 5217",
           "configurations": [ "Watch", "Attach" ],
           "stopAll": true,
       }

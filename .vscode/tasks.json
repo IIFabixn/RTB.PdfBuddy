@@ -39,7 +39,7 @@
         "problemMatcher": "$msCompile"
     },
     {
-      "label": "Run Tailwind Watch",
+      "label": "Tailwind Watch",
       "type": "shell",
       "options": {
         "cwd": "${workspaceFolder}/RTB.PdfBuddy.Web"
@@ -64,6 +64,25 @@
         "panel": "dedicated",
         "echo": true,
         "clear": true
+      }
+    },
+    {
+      "label": "Kill Port 5217",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-c",
+        "lsof -ti :5217 | xargs kill -9"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "echo": true
+      },
+      "group": {
+        "kind": "none",
+        "isDefault": false
       }
     }
   ]

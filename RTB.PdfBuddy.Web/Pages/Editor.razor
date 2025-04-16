@@ -1,3 +1,35 @@
+@page "/editor"
+@using RTB.BlazorUI.Extensions
+@inject NavigationManager NavigationManager
+
+<CollectionList Items="@Files" TItem="string" Context="item">
+    <ItemTemplate>
+        @item
+    </ItemTemplate>
+</CollectionList>
+
 @code {
-    [Parameter] public FileInfo[] Files { get; set; } = Array.Empty<FileInfo>();
+    [Parameter] public string[] Files { get; set; } = [];
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            var uri = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+            if (!string.IsNullOrWhiteSpace(uri))
+            {
+                var fileParams = NavigationManager.ToAbsoluteUri(uri).GetUriParams<string[]>("files");
+                Files = fileParams ?? Array.Empty<string>();
+                Console.WriteLine($"Files: {string.Join(", ", Files)}");
+            }
+            else
+            {
+                Console.WriteLine("URI is empty or invalid.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error parsing URI: {ex.Message}");
+        }
+    }
 }

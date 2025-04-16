@@ -1,68 +1,42 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Components.Forms
+@using System.Text.Json
 @inject IJSRuntime JSRuntime
-<Grid Columns="2fr 1fr" Rows="1fr">
-    <GridItem>
-        <FlexLayout IsVertical>
-            <FlexLayout IsVertical>
-                <h1>Welcome to PdfBuddy!</h1>
-                <p>PdfBuddy is a simple PDF editor that allows you to manipulate PDF files with ease, just by drag and drop!</p>
-            </FlexLayout>
+@inject NavigationManager NavigationManager
 
-            <FlexLayout IsVertical>
-                <h2>Features</h2>
-                <ul>
-                    <li>Merge multiple PDFs into one</li>
-                    <li>Split a PDF into multiple files</li>
-                </ul>
-            </FlexLayout>
+<FlexLayout IsVertical>
+    <FlexLayout IsVertical class="gap-4 items-center">
+        <FlexLayout IsVertical>
+            <h1>Welcome to PdfBuddy!</h1>
+            <p class="text-caption">PdfBuddy is a simple PDF editor that allows you to manipulate PDF files with ease, just by drag and drop!</p>
         </FlexLayout>
-    </GridItem>
-    <GridItem Column="2">
-            <Grid Rows="50% 50%" class="rounded justify-between gap-4">
-                <GridItem class="content-center p-4 border-2 border-white">
-                    <DropArea Id="IndexFileDrop"
-                        OnFileSelected="LoadFiles"
-                        class="h-full rounded flex flex-col justify-center">
-                        <h2 class="text-center">Drag and drop your PDF files here or click to select files.</h2>
-                    </DropArea>
-                </GridItem>
-                <GridItem Row="2" class="overflow-y-auto content-end">
-                    <CollectionList IsVertical
-                                    TItem="string"
-                                    Items="_files"
-                                    class="*:border-t *:first:border-0">
-                        <ItemTemplate>
-                            <FlexLayout Element="li" IsHorizontal class="gap-2 items-center justify-between p-2 border-gray-300">
-                                <h4 class="text-nowrap overflow-hidden text-ellipsis" title="@context">@context</h4>
-                                <button type="button"
-                                        class="text-red-500 self-end shrink-0"
-                                        @onclick="@(() => RemoveFile(context))"
-                                        >Remove</button>
-                            </FlexLayout>
-                        </ItemTemplate>
-                    </CollectionList>
-                </GridItem>
-            </Grid>
-    </GridItem>
-</Grid>
+
+        <FlexLayout IsVertical class="items-center">
+            <h2>Features</h2>
+            <ul>
+                <li>Merge multiple PDFs into one</li>
+                <li>Split a PDF into multiple files</li>
+            </ul>
+        </FlexLayout>
+
+        <DropArea Id="IndexFileDrop"
+            OnFileSelected="LoadFiles"
+            class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
+            <h2 class="text-center">Drag and drop your PDF files here or click to select files.</h2>
+        </DropArea>
+    </FlexLayout>
+</FlexLayout>
 
 @code {
-    private List<string> _files = new List<string>();
-
     private void LoadFiles(InputFileChangeEventArgs args)
     {
         var files = args.GetMultipleFiles();
-        foreach (var file in files)
-        {
-            var fileName = file.Name;
-            _files.Add(fileName);
-        }
-    }
 
-    private void RemoveFile(string fileName)
-    {
-        if (_files.Contains(fileName))
-            _files.Remove(fileName);
+        if (files.Count > 0)
+        {
+            // Serialize file names into a JSON array
+            var fileNamesJson = JsonSerializer.Serialize(files.Select(f => f.Name));
+            NavigationManager.NavigateTo($"/editor?files={Uri.EscapeDataString(fileNamesJson)}");
+        }
     }
 }
