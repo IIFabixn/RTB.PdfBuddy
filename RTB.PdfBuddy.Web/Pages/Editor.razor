@@ -1,15 +1,17 @@
 @page "/editor"
 @using RTB.BlazorUI.Extensions
+@using Microsoft.AspNetCore.Components.Forms
+@using RTB.BlazorUI.Models
 @inject NavigationManager NavigationManager
 
-<CollectionList Items="@Files" TItem="string" Context="item">
+<CollectionList Items="@Files" TItem="BrowserFileModel" Context="file">
     <ItemTemplate>
-        @item
+        @file.Name
     </ItemTemplate>
 </CollectionList>
 
 @code {
-    [Parameter] public string[] Files { get; set; } = [];
+    [Parameter] public BrowserFileModel[] Files { get; set; } = [];
 
     protected override void OnInitialized()
     {
@@ -18,9 +20,9 @@
             var uri = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
             if (!string.IsNullOrWhiteSpace(uri))
             {
-                var fileParams = NavigationManager.ToAbsoluteUri(uri).GetUriParams<string[]>("files");
-                Files = fileParams ?? Array.Empty<string>();
-                Console.WriteLine($"Files: {string.Join(", ", Files)}");
+                var fileParams = NavigationManager.GetUriParams<BrowserFileModel[]>("files");
+                Files = fileParams ?? Array.Empty<BrowserFileModel>();
+                Console.WriteLine($"Files: {string.Join(", ", Files.Select(f => f.Name))}");
             }
             else
             {

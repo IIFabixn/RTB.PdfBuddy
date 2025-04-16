@@ -1,6 +1,9 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Text.Json
+@using RTB.BlazorUI.Extensions
+@using RTB.BlazorUI.Models
+
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 
@@ -34,9 +37,15 @@
 
         if (files.Count > 0)
         {
-            // Serialize file names into a JSON array
-            var fileNamesJson = JsonSerializer.Serialize(files.Select(f => f.Name));
-            NavigationManager.NavigateTo($"/editor?files={Uri.EscapeDataString(fileNamesJson)}");
+            var fileModels = files.Select(file => new BrowserFileModel
+            {
+                Name = file.Name,
+                Size = file.Size,
+                ContentType = file.ContentType
+            }).ToArray();
+
+            // Navigate to the editor page with the files parameter
+            NavigationManager.NavigateWithParams("editor", new KeyValuePair<string, object>("files", fileModels));
         }
     }
 }
