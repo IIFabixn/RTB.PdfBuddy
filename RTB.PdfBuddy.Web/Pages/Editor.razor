@@ -1,37 +1,70 @@
 @page "/editor"
 @using RTB.BlazorUI.Extensions
+@using RTB.PdfBuddy.Shared
 @using Microsoft.AspNetCore.Components.Forms
-@using RTB.BlazorUI.Models
+
 @inject NavigationManager NavigationManager
 
-<CollectionList Items="@Files" TItem="BrowserFileModel" Context="file">
-    <ItemTemplate>
-        @file.Name
-    </ItemTemplate>
-</CollectionList>
+<FlexLayout IsHorizontal class="items-center h-24">
+	<CollectionList IsHorizontal FullHeight Items="@Files" TItem="FileModel" Context="file" class="gap-4 grow">
+		<ItemTemplate>
+			<div class="text-xs border-2 rounded-tr flex flex-col justify-between p-1 w-16" title="@file.Name">
+				<button class="text-red-300 px-0.5 self-end cursor-pointer" @onclick="() => RemoveFile(file)">x</button>
+				<span>@file.PageCount</span>
+				<p class="text-ellipsis whitespace-nowrap min-w-0 overflow-hidden">
+					@file.Name
+				</p>
+			</div>
+		</ItemTemplate>
+	</CollectionList>
+	<DropArea Id="EditorDropArea" class="border p-2 rounded cursor-pointer" Multiple OnFileSelected="AddFiles">
+		<span>Add</span>
+	</DropArea>
+</FlexLayout>
 
 @code {
-    [Parameter] public BrowserFileModel[] Files { get; set; } = [];
+	public List<FileModel> Files { get; set; } = [];
 
-    protected override void OnInitialized()
-    {
-        try
-        {
-            var uri = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-            if (!string.IsNullOrWhiteSpace(uri))
-            {
-                var fileParams = NavigationManager.GetUriParams<BrowserFileModel[]>("files");
-                Files = fileParams ?? Array.Empty<BrowserFileModel>();
-                Console.WriteLine($"Files: {string.Join(", ", Files.Select(f => f.Name))}");
-            }
-            else
-            {
-                Console.WriteLine("URI is empty or invalid.");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error parsing URI: {ex.Message}");
-        }
-    }
+	protected override void OnInitialized()
+	{
+		try
+		{
+			var uri = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+			if (!string.IsNullOrWhiteSpace(uri))
+			{
+				var fileParams = NavigationManager.GetUriParams<FileModel[]>("files");
+				Files = fileParams?.ToList() ?? new List<FileModel>();
+				Console.WriteLine($"Files: {string.Join(", ", Files.Select(f => f.Name))}");
+			}
+			else
+			{
+				Console.WriteLine("URI is empty or invalid.");
+			}
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error parsing URI: {ex.Message}");
+		}
+	}
+
+	private void AddFiles(InputFileChangeEventArgs args)
+	{
+		var files = args.GetMultipleFiles();
+		Files.AddRange(files.Select(f => new FileModel
+		{
+			Name = f.Name,
+			Size = f.Size,
+			ContentType = f.ContentType
+		}));
+		StateHasChanged();
+	}
+
+	private void RemoveFile(FileModel model)
+	{
+		if (!Files.Contains(model)) return;
+
+		Files.Remove(model);
+
+		StateHasChanged();
+	}
 }

@@ -15,7 +15,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "hotReloadEnabled": true,
+      "hotReloadEnabled": true
     },
     "https": {
       "commandName": "Project",
@@ -26,7 +26,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "hotReloadEnabled": true,
+      "hotReloadEnabled": true
     },
     "IIS Express": {
       "commandName": "IISExpress",
@@ -35,7 +35,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "hotReloadEnabled": true,
+      "hotReloadEnabled": true
     }
   }
 }

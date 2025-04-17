@@ -16,10 +16,6 @@
     <ProjectReference Include="..\Libraries\RTB.BlazorUI\RTB.BlazorUI.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Components\" />
-  </ItemGroup>
-
   <Target Name="MinifyTailwindCss" AfterTargets="Publish" Condition="'$(Configuration)' == 'Release'">
     <Exec Command="npx @tailwindcss/cli -i wwwroot/css/tailwind-input.css -o wwwroot/css/tailwind.min.css --minify" />
   </Target>
@@ -27,10 +23,5 @@
   <Target Name="CompileTailwindCss" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
     <Exec Command="npx @tailwindcss/cli -i wwwroot/css/tailwind-input.css -o wwwroot/css/tailwind.min.css" />
   </Target>
-
-  <ItemGroup>
-    <Watch Include="wwwroot/css/tailwind-input.css" />
-    <Watch Include="**/*.razor" />
-  </ItemGroup>
 
 </Project>
