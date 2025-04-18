@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Text.Json
 @using RTB.BlazorUI.Extensions
+@using RTB.PdfBuddy.Web.Extensions
 @using RTB.PdfBuddy.Shared
 
 @inject IJSRuntime JSRuntime
@@ -22,28 +23,30 @@
             </ul>
         </FlexLayout>
 
-        <DropArea Id="IndexFileDrop"
+        <FileDropInput Id="IndexFileDrop"
             OnFileSelected="LoadFiles"
             class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
             <h2 class="text-center">Drag and drop your PDF files here or click to select files.</h2>
-        </DropArea>
+        </FileDropInput>
     </FlexLayout>
 </FlexLayout>
 
 @code {
-    private void LoadFiles(InputFileChangeEventArgs args)
+    private async void LoadFiles(InputFileChangeEventArgs args)
     {
         var files = args.GetMultipleFiles();
 
         if (files.Count > 0)
         {
-            var fileModels = files.Select(file => new FileModel
+            var readTasks = files.ToDictionary(f => f, f => f.GetPageCount());
+            await Task.WhenAll(readTasks.Values);
+            var fileModels = readTasks.Select(file => new FileModel
             {
-                Name = file.Name,
-                Size = file.Size,
-                ContentType = file.ContentType
+                Name = file.Key.Name,
+                Size = file.Key.Size,
+                ContentType = file.Key.ContentType,
+                PageCount = file.Value.Result,
             }).ToArray();
-
             // Navigate to the editor page with the files parameter
             NavigationManager.NavigateWithParams("editor", new KeyValuePair<string, object>("files", fileModels));
         }

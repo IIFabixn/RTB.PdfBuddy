@@ -2,69 +2,110 @@
 @using RTB.BlazorUI.Extensions
 @using RTB.PdfBuddy.Shared
 @using Microsoft.AspNetCore.Components.Forms
+@using RTB.PdfBuddy.Web.Extensions
 
 @inject NavigationManager NavigationManager
 
-<FlexLayout IsHorizontal class="items-center h-24">
-	<CollectionList IsHorizontal FullHeight Items="@Files" TItem="FileModel" Context="file" class="gap-4 grow">
-		<ItemTemplate>
-			<div class="text-xs border-2 rounded-tr flex flex-col justify-between p-1 w-16" title="@file.Name">
-				<button class="text-red-300 px-0.5 self-end cursor-pointer" @onclick="() => RemoveFile(file)">x</button>
-				<span>@file.PageCount</span>
-				<p class="text-ellipsis whitespace-nowrap min-w-0 overflow-hidden">
-					@file.Name
-				</p>
-			</div>
-		</ItemTemplate>
-	</CollectionList>
-	<DropArea Id="EditorDropArea" class="border p-2 rounded cursor-pointer" Multiple OnFileSelected="AddFiles">
-		<span>Add</span>
-	</DropArea>
-</FlexLayout>
+<Grid Rows="1fr auto" class="gap-4">
+	<GridItem Row="1" class="min-w-0 min-h-0 overflow-auto">
+		<CollectionList IsVertical FullHeight Items="@Files" TItem="FileModel" Context="file" class="gap-4">
+			<ItemTemplate>
+				<FlexLayout IsVertical class="gap-2">
+					<div>
+						<button class="text-red-300 px-0.5 self-end cursor-pointer" @onclick="() => RemoveFile(file)">x</button>
+						<input type="text"
+							class="border-b min-w-xs outline-none px-1 self-start min-w-42 max-w-full"
+							placeholder="File name"
+							style="field-sizing: content;"
+							@bind-value="file.Name" />
+					</div>
+
+					<FlexLayout IsHorizontal class="gap-1">
+						@foreach(var pageIndex in Enumerable.Range(1, file.PageCount))
+						{
+							<DraggableItem ItemData="@pageIndex">
+								<FlexLayout IsVertical class="h-24 text-xs border-2 rounded-tr flex flex-col justify-between p-1 w-16">
+									<span>@pageIndex</span>
+								</FlexLayout>
+							</DraggableItem>
+						}
+					</FlexLayout>
+				</FlexLayout>
+			</ItemTemplate>
+		</CollectionList>
+	</GridItem>
+	<GridItem Row="2">
+		<DropZone OnItemDroppedObject="PageMovedToNewFile">
+			<FileDropInput Id="EditorNewDocumentDropArea" OnFileSelected="FileAdded">
+				<div class="border rounded min-h-18 flex flex-col p-2 justify-center text-gray-400 text-sm">
+					<p class="max-w-lg">Create New Document by dragging pages of existing files into here or
+						import new files by dragging them into here</p>
+				</div>
+			</FileDropInput>
+		</DropZone>
+	</GridItem>
+</Grid>
 
 @code {
-	public List<FileModel> Files { get; set; } = [];
+    public List<FileModel> Files { get; set; } = [];
 
-	protected override void OnInitialized()
-	{
-		try
-		{
-			var uri = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-			if (!string.IsNullOrWhiteSpace(uri))
-			{
-				var fileParams = NavigationManager.GetUriParams<FileModel[]>("files");
-				Files = fileParams?.ToList() ?? new List<FileModel>();
-				Console.WriteLine($"Files: {string.Join(", ", Files.Select(f => f.Name))}");
-			}
-			else
-			{
-				Console.WriteLine("URI is empty or invalid.");
-			}
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"Error parsing URI: {ex.Message}");
-		}
-	}
+    protected override void OnInitialized()
+    {
+        try
+        {
+            var uri = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+            if (!string.IsNullOrWhiteSpace(uri))
+            {
+                var fileParams = NavigationManager.GetUriParams<FileModel[]>("files");
+                Files = fileParams?.ToList() ?? new List<FileModel>();
+                Console.WriteLine($"Files: {string.Join(", ", Files.Select(f => f.Name))}");
+            }
+            else
+            {
+                Console.WriteLine("URI is empty or invalid.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error parsing URI: {ex.Message}");
+        }
+    }
 
-	private void AddFiles(InputFileChangeEventArgs args)
-	{
-		var files = args.GetMultipleFiles();
-		Files.AddRange(files.Select(f => new FileModel
+    private void RemoveFile(FileModel model)
+    {
+        if (!Files.Contains(model)) return;
+
+        Files.Remove(model);
+
+        StateHasChanged();
+    }
+
+    private async void FileAdded(InputFileChangeEventArgs args)
+    {
+        var files = args.GetMultipleFiles().ToDictionary(f => f, f => f.GetPageCount());
+        await Task.WhenAll(files.Values);
+        Files.AddRange(files.Select(f => new FileModel
 		{
-			Name = f.Name,
-			Size = f.Size,
-			ContentType = f.ContentType
+			Name = f.Key.Name,
+			Size = f.Key.Size,
+			ContentType = f.Key.ContentType,
+			PageCount = f.Value.Result,
 		}));
-		StateHasChanged();
-	}
-
-	private void RemoveFile(FileModel model)
-	{
-		if (!Files.Contains(model)) return;
-
-		Files.Remove(model);
-
-		StateHasChanged();
-	}
+        StateHasChanged();
+    }
+	
+    private void PageMovedToNewFile(object? args) // Changed parameter type from string to object?
+    {
+		// Handle the logic for moving pages between files here.
+		// This is a placeholder for the actual implementation.
+		Files.Add(new FileModel
+		{
+			Name = "New File",
+			Size = 0,
+			ContentType = "application/pdf",
+			PageCount = 1, // Adjust as needed
+		});
+		StateHasChanged(); // Trigger re-render if needed
+		Console.WriteLine($"Page moved to new file: {args}");
+    }
 }
