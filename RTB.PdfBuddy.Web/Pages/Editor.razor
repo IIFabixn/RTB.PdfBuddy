@@ -1,41 +1,49 @@
 @page "/editor"
+@using Microsoft.AspNetCore.Components.Sections
+@using PdfSharpCore.Pdf
 @using RTB.BlazorUI.Extensions
-@using RTB.PdfBuddy.Shared
 @using Microsoft.AspNetCore.Components.Forms
+@using RTB.BlazorUI.Services.BusyTracker
+@using RTB.BlazorUI.Services.DataNavigationService
+@using RTB.BlazorUI.Services.DragDrop.Components
 @using RTB.PdfBuddy.Web.Extensions
 
-@inject NavigationManager NavigationManager
+@inject ILogger<Editor> Logger
+@inject DataNavigationService DataNavigationService
+@inject BusyTracker BusyTracker
+@inherits RTBComponent
 
 <Grid Rows="1fr auto" class="gap-4">
 	<GridItem Row="1" class="min-w-0 min-h-0 overflow-auto">
-		<CollectionList IsVertical FullHeight Items="@Files" TItem="FileModel" Context="file" class="gap-4">
+		<CollectionList IsVertical FullHeight Items="@Files" TItem="PdfDocument" Context="file" class="gap-4">
 			<ItemTemplate>
 				<FlexLayout IsVertical class="gap-2">
 					<div>
 						<button class="text-red-300 px-0.5 self-end cursor-pointer" @onclick="() => RemoveFile(file)">x</button>
 						<input type="text"
-							class="border-b min-w-xs outline-none px-1 self-start min-w-42 max-w-full"
-							placeholder="File name"
-							style="field-sizing: content;"
-							@bind-value="file.Name" />
+						class="border-b min-w-xs outline-none px-1 self-start min-w-42 max-w-full"
+						placeholder="File name"
+						style="field-sizing: content;"
+						@bind-value="file.Info.Title" />
 					</div>
-
-					<FlexLayout IsHorizontal class="gap-1">
-						@foreach(var pageIndex in Enumerable.Range(1, file.PageCount))
-						{
-							<DraggableItem ItemData="@pageIndex">
-								<FlexLayout IsVertical class="h-24 text-xs border-2 rounded-tr flex flex-col justify-between p-1 w-16">
-									<span>@pageIndex</span>
-								</FlexLayout>
-							</DraggableItem>
-						}
-					</FlexLayout>
+					<DropZone TObject="PdfPage" OnObjectDropped="@(page => AddPageToFile(file, page))">
+						<FlexLayout IsHorizontal class="gap-1">
+							@foreach(var pageIndex in Enumerable.Range(0, file.PageCount - 1))
+							{
+								<DraggableItem ItemData="@file.Pages[pageIndex]">
+									<FlexLayout IsVertical class="h-24 text-xs border-2 rounded-tr flex flex-col justify-between p-1 w-16">
+										<span>@pageIndex</span>
+									</FlexLayout>
+								</DraggableItem>
+							}
+						</FlexLayout>
+					</DropZone>
 				</FlexLayout>
 			</ItemTemplate>
 		</CollectionList>
 	</GridItem>
 	<GridItem Row="2">
-		<DropZone OnItemDroppedObject="PageMovedToNewFile">
+		<DropZone TObject="PdfPage" OnObjectDropped="PageMovedToNewFile">
 			<FileDropInput Id="EditorNewDocumentDropArea" OnFileSelected="FileAdded">
 				<div class="border rounded min-h-18 flex flex-col p-2 justify-center text-gray-400 text-sm">
 					<p class="max-w-lg">Create New Document by dragging pages of existing files into here or
@@ -47,65 +55,47 @@
 </Grid>
 
 @code {
-    public List<FileModel> Files { get; set; } = [];
+	public List<PdfDocument> Files { get; set; } = [];
 
-    protected override void OnInitialized()
-    {
-        try
-        {
-            var uri = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-            if (!string.IsNullOrWhiteSpace(uri))
-            {
-                var fileParams = NavigationManager.GetUriParams<FileModel[]>("files");
-                Files = fileParams?.ToList() ?? new List<FileModel>();
-                Console.WriteLine($"Files: {string.Join(", ", Files.Select(f => f.Name))}");
-            }
-            else
-            {
-                Console.WriteLine("URI is empty or invalid.");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error parsing URI: {ex.Message}");
-        }
-    }
-
-    private void RemoveFile(FileModel model)
-    {
-        if (!Files.Contains(model)) return;
-
-        Files.Remove(model);
-
-        StateHasChanged();
-    }
-
-    private async void FileAdded(InputFileChangeEventArgs args)
-    {
-        var files = args.GetMultipleFiles().ToDictionary(f => f, f => f.GetPageCount());
-        await Task.WhenAll(files.Values);
-        Files.AddRange(files.Select(f => new FileModel
+	protected override void OnInitialized()
+	{
+		if (DataNavigationService.TryGetData<PdfDocument[]>("files", out var files) && files?.Length > 0)
 		{
-			Name = f.Key.Name,
-			Size = f.Key.Size,
-			ContentType = f.Key.ContentType,
-			PageCount = f.Value.Result,
-		}));
-        StateHasChanged();
-    }
-	
-    private void PageMovedToNewFile(object? args) // Changed parameter type from string to object?
-    {
-		// Handle the logic for moving pages between files here.
-		// This is a placeholder for the actual implementation.
-		Files.Add(new FileModel
+			Files.AddRange(files);
+		}
+	}
+
+	private void RemoveFile(PdfDocument model)
+	{
+		if (!Files.Contains(model)) return;
+
+		Files.Remove(model);
+
+		StateHasChanged();
+	}
+
+	private async void FileAdded(InputFileChangeEventArgs args)
+	{
+		using (BusyTracker.Track("FileAdded"))
 		{
-			Name = "New File",
-			Size = 0,
-			ContentType = "application/pdf",
-			PageCount = 1, // Adjust as needed
-		});
+			var fileTasks = args.GetMultipleFiles().Select(f => f.LoadPdfDocument());
+			var files = await Task.WhenAll(fileTasks);
+			Files.AddRange(files);
+			StateHasChanged();
+		}
+	}
+
+	private void AddPageToFile(PdfDocument file, PdfPage page)
+	{
+	}
+
+	private void PageMovedToNewFile(PdfPage? args)
+	{
+		var doc = new PdfDocument();
+		doc.Info.Title = "New Document";
+		doc.AddPage(args);
+		Files.Add(doc);
 		StateHasChanged(); // Trigger re-render if needed
-		Console.WriteLine($"Page moved to new file: {args}");
+		Logger.LogDebug($"Page moved to new file: {args}");
     }
 }

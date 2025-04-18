@@ -1,22 +1,46 @@
-﻿@inherits LayoutComponentBase
+﻿@using RTB.BlazorUI.Services.BusyTracker
+@using RTB.BlazorUI.Services.Layout
+@using Microsoft.AspNetCore.Components.Sections
 
-<FlexLayout IsVertical FullHeight class="page flex flex-col bg-zinc-800 text-white">
-    <nav class="flex flex-row justify-between p-4 container self-center">
-        <NavLink href="">
-            <FlexLayout IsHorizontal class="items-center">
+@inherits LayoutComponentBase
+
+@inject BusyTracker BusyTracker
+
+@code {
+    internal static object TopbarSection = new();
+
+    protected override void OnInitialized()
+    {
+        BusyTracker.OnBusyChanged += StateHasChanged;
+    }
+}
+
+<CascadingValue Value="this">
+    <FlexLayout IsVertical FullHeight class="page flex flex-col bg-zinc-800 text-white">
+        <nav class="flex flex-row justify-between p-4 container self-center">
+            <NavLink href="">
+                <FlexLayout IsHorizontal class="items-center">
                     <img src="_content/RTB.BlazorUI/rtb_logo.svg" alt="Refused to Brew Logo" class="h-12 w-12" />
                     PdfBuddy
-            </FlexLayout>
-        </NavLink>
-        <ul class="flex flex-row gap-4 items-center">
-            <li class="hover:text-slate-400"><NavLink href="infos">
-                <img src="_content/RTB.BlazorUI/svg/info.svg" alt="Refused to Brew Logo" class="h-6 w-6" />
-            </NavLink></li>
-        </ul>
-    </nav>
-    <div class="flex flex-col overflow-auto h-full">
-        <div class="container self-center gap-4 p-4 bg-zinc-900 rounded h-full">
-            @Body
+                </FlexLayout>
+            </NavLink>
+            <ul class="flex flex-row gap-4 items-center">
+                <SectionOutlet SectionId="@TopbarSection" />
+                @if (BusyTracker.IsAnyBusy)
+                {
+                    <div class="animate-spin inline text-red-400">.</div>
+                }
+                <li class="hover:text-slate-400">
+                    <NavLink href="infos">
+                        <img src="_content/RTB.BlazorUI/svg/info.svg" alt="Refused to Brew Logo" class="h-6 w-6" />
+                    </NavLink>
+                </li>
+            </ul>
+        </nav>
+        <div class="flex flex-col overflow-auto h-full">
+            <div class="container self-center gap-4 p-4 bg-zinc-900 rounded h-full">
+                @Body
+            </div>
         </div>
-    </div>
-</FlexLayout>
+    </FlexLayout>
+</CascadingValue>

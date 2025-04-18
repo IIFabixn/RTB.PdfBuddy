@@ -2,11 +2,17 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Text.Json
 @using RTB.BlazorUI.Extensions
+@using RTB.BlazorUI.Services.BusyTracker
+@using RTB.BlazorUI.Services.DataNavigationService
 @using RTB.PdfBuddy.Web.Extensions
-@using RTB.PdfBuddy.Shared
+@using RTB.BlazorUI.Services.DragDrop.Components
+@using Microsoft.AspNetCore.Components.Sections
 
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@inject DataNavigationService DataNavigationService
+@inject BusyTracker BusyTracker
+@inherits RTBComponent
 
 <FlexLayout IsVertical>
     <FlexLayout IsVertical class="gap-4 items-center">
@@ -24,31 +30,27 @@
         </FlexLayout>
 
         <FileDropInput Id="IndexFileDrop"
-            OnFileSelected="LoadFiles"
-            class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
+        OnFileSelected="@(e => LoadFiles(e))"
+        class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
             <h2 class="text-center">Drag and drop your PDF files here or click to select files.</h2>
         </FileDropInput>
     </FlexLayout>
 </FlexLayout>
 
 @code {
-    private async void LoadFiles(InputFileChangeEventArgs args)
+    private async Task LoadFiles(InputFileChangeEventArgs args)
     {
-        var files = args.GetMultipleFiles();
-
-        if (files.Count > 0)
+        using (BusyTracker.Track())
         {
-            var readTasks = files.ToDictionary(f => f, f => f.GetPageCount());
-            await Task.WhenAll(readTasks.Values);
-            var fileModels = readTasks.Select(file => new FileModel
+            var files = args.GetMultipleFiles();
+
+            if (files.Count > 0)
             {
-                Name = file.Key.Name,
-                Size = file.Key.Size,
-                ContentType = file.Key.ContentType,
-                PageCount = file.Value.Result,
-            }).ToArray();
-            // Navigate to the editor page with the files parameter
-            NavigationManager.NavigateWithParams("editor", new KeyValuePair<string, object>("files", fileModels));
+                var readTasks = files.Select(f => f.LoadPdfDocument());
+                var documents = await Task.WhenAll(readTasks);
+
+                DataNavigationService.NavigateTo("editor", parameter: [new ("files", documents)]);
+            }
         }
     }
 }
