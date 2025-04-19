@@ -1,0 +1,53 @@
+﻿@using PdfSharpCore.Pdf
+@using RTB.BlazorUI.Extensions
+@using RTB.BlazorUI.Services.BusyTracker
+@using RTB.PdfBuddy.Web.Extensions
+@using System.Collections.Concurrent
+
+@inject IJSRuntime JSRuntime
+@inject BusyTracker BusyTracker
+
+@inherits RTBComponent
+
+@code {
+    [Parameter] public PdfPage Page { get; set; } = default!;
+}
+
+@if (thumbnail is null)
+{
+    <div class="animate-pulse @(CapturedAttributes.TryGetValue("class", out var classes) ? classes : string.Empty)"
+    @attributes="@(CapturedAttributes.Without("class"))"></div>
+}
+else
+{
+    <img src="@thumbnail" @attributes="@CapturedAttributes" />
+}
+
+@code 
+{
+    private static readonly Dictionary<string, string> ThumbnailCache = new();
+
+    private string? thumbnail;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Page.Tag is not string key)
+        {
+            key = Page.GetOrAssignId();
+        }
+
+        if (ThumbnailCache.TryGetValue(key, out var cached))
+        {
+            thumbnail = cached;
+            return;
+        }
+
+        using (BusyTracker.Track($"LoadPdfView.{key}"))
+        {
+            var pdfBytes = await Task.Run(Page.ExtractPageAsBytes);
+            thumbnail = await JSRuntime.InvokeAsync<string>("pdfRenderer.renderPageThumbnail", new object[] { pdfBytes });   
+            ThumbnailCache[key] = thumbnail;
+            Console.WriteLine($"Thumbnail for {key} cached");
+        }
+    }
+}

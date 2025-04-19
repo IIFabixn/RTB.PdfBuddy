@@ -12,10 +12,12 @@ public static class BrowserFileExtension
         {
             throw new ArgumentNullException(nameof(file), "File cannot be null.");
         }
+
         if (file.ContentType != "application/pdf")
         {
             throw new InvalidOperationException("The file is not a PDF document.");
         }
+
         if (file.Size == 0)
         {
             throw new InvalidOperationException("The file is empty.");
@@ -29,6 +31,11 @@ public static class BrowserFileExtension
             memoryStream.Position = 0; // Reset the position to the beginning
             var document = PdfReader.Open(memoryStream, PdfDocumentOpenMode.Import);
             document.Info.Title = file.Name;
+            foreach(var page in document.Pages)
+            {
+                page.GetOrAssignId();
+            }
+
             return document;
         });
     }

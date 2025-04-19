@@ -9,8 +9,10 @@
 @using RTB.BlazorUI.Services.DataNavigationService
 @using RTB.BlazorUI.Services.DragDrop.Components
 @using RTB.PdfBuddy.Web.Extensions
+@using System.Net.Mime
 
 @inject ILogger<Editor> Logger
+@inject IJSRuntime JSRuntime
 @inject DataNavigationService DataNavigationService
 @inject BusyTracker BusyTracker
 
@@ -21,28 +23,31 @@
         <CollectionList IsVertical FullHeight Items="@Files" TItem="PdfDocument" Context="file" class="gap-4">
             <ItemTemplate>
                 <FlexLayout IsVertical class="gap-2">
-                    <div>
+                    <FlexLayout IsHorizontal class="gap-2">
                         <button class="text-red-300 px-0.5 self-end cursor-pointer" @onclick="() => RemoveFile(file)">x</button>
                         <input type="text"
-                        class="border-b min-w-xs outline-none px-1 self-start min-w-42 max-w-full"
-                        placeholder="File name"
-                        style="field-sizing: content;"
-                        @bind-value="file.Info.Title" />
-                    </div>
+                            class="border-b min-w-xs outline-none px-1 self-start min-w-42 max-w-full"
+                            placeholder="File name"
+                            style="field-sizing: content;"
+                            @bind-value="file.Info.Title" />
+                        <button class="self-end">Save</button>
+                    </FlexLayout>
                     <FlexLayout IsHorizontal class="gap-1">
                         @for (var pageIndex = 0; pageIndex < file.PageCount; pageIndex++)
                         {
                             var capturedIndex = pageIndex;
-                            <DropZone class="h-full w-2" DraggingClass="bg-blue-100" TObject="PdfPage" OnObjectDropped="page => MovePageToFileAtIndex(page, file, capturedIndex)" />
+                            var capturedPage = file.Pages[capturedIndex];
+                            <DropZone class="h-full min-w-2" DraggingClass="bg-blue-100" TObject="PdfPage" OnObjectDropped="page => MovePageToFileAtIndex(page, file, capturedIndex)" />
 
-                            <DraggableItem ItemData="@file.Pages[capturedIndex]">
-                                <FlexLayout IsVertical class="h-24 text-xs border-2 rounded-tr flex flex-col justify-between p-1 w-16">
-                                    <span>@capturedIndex</span>
+                            <DraggableItem ItemData="@capturedPage">
+                                <FlexLayout IsVertical class="h-24 text-xs border-2 rounded-tr flex flex-col justify-between p-1 w-16 overflow-clip relative">
+                                    <button class="shadow absolute top-1 right-1 text-red-400" @onclick="@(() => RemovePageFromFile(file, capturedPage))">x</button>
+                                    <PdfViewer Page="capturedPage" class="w-24 h-32 border" />
                                 </FlexLayout>
                             </DraggableItem>
                         }
                         <!-- Drop after the last page -->
-                        <DropZone class="h-full min-w-2 grow" TObject="PdfPage" OnObjectDropped="(page) => MovePageToFile(page, file)" />
+                        <DropZone class="h-full min-w-2 grow" TObject="PdfPage" OnObjectDropped="(page) => MovePagesToFile(file, page)" />
                     </FlexLayout>
                 </FlexLayout>
             </ItemTemplate>
@@ -50,8 +55,9 @@
     </GridItem>
     <GridItem Row="2">
         <FlexLayout IsHorizontal class="gap-2 items-center">
-            <DropZone class="grow" TObject="PdfPage" OnObjectDropped="MovePageToNewFile">
-                <FileDropInput Id="EditorNewDocumentDropArea" OnFileSelected="FileAdded">
+            <DropZone class="grow" TObject="PdfPage" OnObjectDropped="@(page => MovePagesToNewFile(page))">
+                <FileDropInput Id="EditorNewDocumentDropArea" OnInput="FileAdded"
+                AcceptedTypes="@(new[] { MediaTypeNames.Application.Pdf })">
                     <div class="border rounded min-h-18 flex flex-col p-2 justify-center text-gray-400 text-sm">
                         <p class="max-w-lg">Create New Document by dragging pages of existing files into here or
                             import new files by dragging them into here</p>
@@ -59,7 +65,7 @@
                 </FileDropInput>
             </DropZone>
             <button type="button">
-                Save
+                Save All
             </button>
         </FlexLayout>
     </GridItem>
@@ -83,45 +89,74 @@
         StateHasChanged();
     }
 
-    private void MovePageToFile(PdfPage page, PdfDocument file)
-    {
-        if (page.Owner == file) return;
-
-        file.AddPage(page);
-        StateHasChanged();
-
-        // Remove the page from the original document
-        var originalDocument = page.Owner;
-        if (originalDocument != null)
-        {
-            originalDocument.Pages.Remove(page);
-            if (originalDocument.PageCount == 0)
-            {
-                Files.Remove(originalDocument);
-            }
-        }
-        StateHasChanged();
-        Logger.LogDebug($"Page moved to file: {page} -> {file}");
-    }
-
-    private async void FileAdded(InputFileChangeEventArgs args)
+    private async void FileAdded(IBrowserFile[] files)
     {
         using (BusyTracker.Track("FileAdded"))
         {
-            var fileTasks = args.GetMultipleFiles().Select(f => f.LoadPdfDocument());
-            var files = await Task.WhenAll(fileTasks);
-            Files.AddRange(files);
-            StateHasChanged();
+            var loadTasks = files.Select(file => Task.Run(file.LoadPdfDocument));
+            var loadedFiles = await Task.WhenAll(loadTasks);
+            Files.AddRange(loadedFiles);
         }
     }
 
-    private void MovePageToNewFile(PdfPage page)
+    private void MovePagesToFile(PdfDocument file, params PdfPage[] pages)
+    {
+        foreach(var page in pages)
+        {
+            var addedPage = file.AddPage(page);
+            addedPage.Tag = page.GetOrAssignId(); // Reassign the tag to maintain ID consistency
+
+            // Remove the page from the original document
+            var originalDocument = page.Owner;
+            if (originalDocument != null)
+            {
+                originalDocument.Pages.Remove(page);
+                if (originalDocument.PageCount == 0)
+                {
+                    Files.Remove(originalDocument);
+                }
+            }
+
+            Logger.LogDebug($"Page moved to file: {page} -> {file}");
+        }
+
+        StateHasChanged();
+    }
+
+    private void RemovePageFromFile(PdfDocument doc, PdfPage page)
+    {
+        doc.Pages.Remove(page);
+        StateHasChanged();
+    }
+
+    private void MovePagesToNewFile(params PdfPage[] pages)
     {
         // Create a new empty PDF document
         var doc = new PdfDocument();
         doc.Info.Title = "New Document";
-        // Add the page to the new document
-        doc.AddPage(page, AnnotationCopyingType.DeepCopy);
+
+        // We'll map old tags to maintain IDs
+        var pageTags = new List<string>();
+
+        // Add the pages to the new document
+        foreach(var page in pages)
+        {
+            pageTags.Add(page.GetOrAssignId()); // store tag/id it for later reassignment
+
+            var importedPage = doc.AddPage(page, AnnotationCopyingType.DeepCopy);
+            var originalDocument = page.Owner;
+            if (originalDocument != null)
+            {
+                // Remove the page from the original document
+                originalDocument.Pages.Remove(page);
+                if (originalDocument.PageCount == 0)
+                {
+                    Files.Remove(originalDocument);
+                }
+            }
+
+            Logger.LogDebug($"Page moved to new file: {page}");
+        }
 
         // Save the document to a memory stream
         using var memoryStream = new MemoryStream();
@@ -130,25 +165,16 @@
 
         // Reopen the document in Import mode (if needed for further operations)
         var importedDoc = PdfReader.Open(memoryStream, PdfDocumentOpenMode.Import);
-
-        // Add the document to the list
-        Files.Add(importedDoc);
-        StateHasChanged();
-
-
-        // Get the original document (owner of the page)
-        var originalDocument = page.Owner;
-        if (originalDocument != null)
+        Console.WriteLine(importedDoc.Pages[0].Tag);
+        
+        // Re-assign the tags in same order
+        for (int i = 0; i < importedDoc.PageCount && i < pageTags.Count; i++)
         {
-            // Remove the page from the original document
-            originalDocument.Pages.Remove(page);
-            if (originalDocument.PageCount == 0)
-            {
-                Files.Remove(originalDocument);
-            }
+            importedDoc.Pages[i].Tag = pageTags[i];
         }
 
-        Logger.LogDebug($"Page moved to new file: {page}");
+        Files.Add(importedDoc);
+        StateHasChanged();
     }
 
     private void MovePageToFileAtIndex(PdfPage page, PdfDocument file, int index)
@@ -168,7 +194,6 @@
             if (currentIndex == index || currentIndex == index - 1)
                 return;
 
-            Console.WriteLine($"Moving page {currentIndex} to {index}");
             file.Pages.MovePage(currentIndex, index);
         }
         else
@@ -181,8 +206,6 @@
             {
                 Files.Remove(originalDoc);
             }
-
-            Console.WriteLine($"Moving page from {originalDoc?.Info.Title} to {file.Info.Title}");
         }
 
         StateHasChanged();

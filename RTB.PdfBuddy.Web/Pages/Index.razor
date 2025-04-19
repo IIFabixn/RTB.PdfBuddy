@@ -1,12 +1,14 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Text.Json
+@using PdfSharpCore.Pdf
 @using RTB.BlazorUI.Extensions
 @using RTB.BlazorUI.Services.BusyTracker
 @using RTB.BlazorUI.Services.DataNavigationService
 @using RTB.PdfBuddy.Web.Extensions
 @using RTB.BlazorUI.Services.DragDrop.Components
 @using Microsoft.AspNetCore.Components.Sections
+@using System.Net.Mime
 
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
@@ -30,27 +32,26 @@
         </FlexLayout>
 
         <FileDropInput Id="IndexFileDrop"
-            OnFileSelected="ImportFiles"
-            class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
+        AcceptedTypes="@(new[] { MediaTypeNames.Application.Pdf })"
+        OnInput="ImportFiles"
+        class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
             <h2 class="text-center">Drag and drop your PDF files here or click to select files.</h2>
         </FileDropInput>
     </FlexLayout>
 </FlexLayout>
 
 @code {
-    private async Task ImportFiles(InputFileChangeEventArgs args)
+    private async Task ImportFiles(IBrowserFile[] files)
     {
+        if (files.Length == 0) return;
+
         using (BusyTracker.Track())
         {
-            var files = args.GetMultipleFiles();
+            var tasks = files.Select(file => Task.Run(file.LoadPdfDocument));
 
-            if (files.Count > 0)
-            {
-                var readTasks = files.Select(f => f.LoadPdfDocument());
-                var documents = await Task.WhenAll(readTasks);
+            var documents = await Task.WhenAll(tasks);
 
-                DataNavigationService.NavigateTo("editor", parameter: [new ("files", documents)]);
-            }
+            DataNavigationService.NavigateTo("editor", parameter: [new ("files", documents)]);
         }
     }
 }
