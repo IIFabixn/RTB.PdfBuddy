@@ -1,6 +1,7 @@
 @page "/editor"
 @using Microsoft.AspNetCore.Components.Sections
 @using PdfSharpCore.Pdf
+@using PdfSharpCore.Pdf.IO
 @using RTB.BlazorUI.Extensions
 @using Microsoft.AspNetCore.Components.Forms
 @using RTB.BlazorUI.Services.BusyTracker
@@ -11,6 +12,7 @@
 @inject ILogger<Editor> Logger
 @inject DataNavigationService DataNavigationService
 @inject BusyTracker BusyTracker
+
 @inherits RTBComponent
 
 <Grid Rows="1fr auto" class="gap-4">
@@ -26,9 +28,9 @@
 						style="field-sizing: content;"
 						@bind-value="file.Info.Title" />
 					</div>
-					<DropZone TObject="PdfPage" OnObjectDropped="@(page => AddPageToFile(file, page))">
+					<DropZone TObject="PdfPage" OnObjectDropped="@(page => MovePageToFile(page, file))">
 						<FlexLayout IsHorizontal class="gap-1">
-							@foreach(var pageIndex in Enumerable.Range(0, file.PageCount - 1))
+							@for (var pageIndex = 0; pageIndex < file.PageCount; pageIndex++)
 							{
 								<DraggableItem ItemData="@file.Pages[pageIndex]">
 									<FlexLayout IsVertical class="h-24 text-xs border-2 rounded-tr flex flex-col justify-between p-1 w-16">
@@ -43,7 +45,7 @@
 		</CollectionList>
 	</GridItem>
 	<GridItem Row="2">
-		<DropZone TObject="PdfPage" OnObjectDropped="PageMovedToNewFile">
+		<DropZone TObject="PdfPage" OnObjectDropped="MovePageToNewFile">
 			<FileDropInput Id="EditorNewDocumentDropArea" OnFileSelected="FileAdded">
 				<div class="border rounded min-h-18 flex flex-col p-2 justify-center text-gray-400 text-sm">
 					<p class="max-w-lg">Create New Document by dragging pages of existing files into here or
@@ -68,9 +70,15 @@
 	private void RemoveFile(PdfDocument model)
 	{
 		if (!Files.Contains(model)) return;
-
 		Files.Remove(model);
+		StateHasChanged();
+	}
 
+	private void MovePageToFile(PdfPage page, PdfDocument file)
+	{
+		if (page.Owner == file) return;
+
+		file.AddPage(page);
 		StateHasChanged();
 	}
 
@@ -85,17 +93,13 @@
 		}
 	}
 
-	private void AddPageToFile(PdfDocument file, PdfPage page)
-	{
-	}
-
-	private void PageMovedToNewFile(PdfPage? args)
+	private void MovePageToNewFile(PdfPage? args)
 	{
 		var doc = new PdfDocument();
 		doc.Info.Title = "New Document";
-		doc.AddPage(args);
+		doc.AddPage(args, AnnotationCopyingType.DeepCopy);
 		Files.Add(doc);
-		StateHasChanged(); // Trigger re-render if needed
+        StateHasChanged();
 		Logger.LogDebug($"Page moved to new file: {args}");
     }
 }
