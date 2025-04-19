@@ -30,15 +30,15 @@
         </FlexLayout>
 
         <FileDropInput Id="IndexFileDrop"
-        OnFileSelected="@(e => LoadFiles(e))"
-        class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
+            OnFileSelected="ImportFiles"
+            class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
             <h2 class="text-center">Drag and drop your PDF files here or click to select files.</h2>
         </FileDropInput>
     </FlexLayout>
 </FlexLayout>
 
 @code {
-    private async Task LoadFiles(InputFileChangeEventArgs args)
+    private async Task ImportFiles(InputFileChangeEventArgs args)
     {
         using (BusyTracker.Track())
         {
