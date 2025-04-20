@@ -36,6 +36,16 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "hotReloadEnabled": true
+    },
+    "Watch": {
+      "commandName": "Executable",
+      "workingDirectory": "$(ProjectDir)",
+      "executablePath": "dotnet",
+      "applicationUrl": "http://localhost:5217",
+      "commandLineArgs": "watch run debug --launch-profile http",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     }
   }
 }

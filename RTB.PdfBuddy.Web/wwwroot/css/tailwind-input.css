@@ -1,6 +1,7 @@
 @import "tailwindcss" source("../../../");
 
-@source "**/*.razor"
-@source "**/*.html"
-@source "**/*.css"
-@source "**/*.cs"
+@source "**/*.razor";
+@source "**/*.html";
+@source "**/*.css";
+@source "**/*.cs";
+@plugin 'tailwind-scrollbar';

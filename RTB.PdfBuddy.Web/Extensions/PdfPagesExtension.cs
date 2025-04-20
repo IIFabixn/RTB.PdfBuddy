@@ -5,6 +5,11 @@ namespace RTB.PdfBuddy.Web.Extensions
 {
     public static class PdfPagesExtension
     {
+        public static int GetPageIndex(this PdfDocument doc, PdfPage page)
+        {
+            return doc.Pages.GetPageIndex(page);
+        }
+
         public static int GetPageIndex(this PdfPages pages, PdfPage page)
         {
             for (int i = 0; i < pages.Count; i++)

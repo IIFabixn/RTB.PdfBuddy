@@ -1,8 +1,14 @@
-﻿@using RTB.PdfBuddy.Web.Layouts
+﻿@using RTB.BlazorUI.Services.Dialog
+@using RTB.BlazorUI.Services.Dialog.Components
+@using RTB.PdfBuddy.Web.Layouts
+
+@inject IDialogService DialogService
+
 <Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        <DialogProvider />
     </Found>
     <NotFound>
         <PageTitle>Not found</PageTitle>

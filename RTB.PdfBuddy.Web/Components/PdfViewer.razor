@@ -10,18 +10,13 @@
 @inherits RTBComponent
 
 @code {
-    [Parameter] public PdfPage Page { get; set; } = default!;
+    [Parameter] public PdfPage? Page { get; set; }
 }
 
-@if (thumbnail is null)
-{
-    <div class="animate-pulse @(CapturedAttributes.TryGetValue("class", out var classes) ? classes : string.Empty)"
-    @attributes="@(CapturedAttributes.Without("class"))"></div>
-}
-else
-{
-    <img src="@thumbnail" @attributes="@CapturedAttributes" />
-}
+<div class="grid place-items-center @(thumbnail is null ? "animate-pulse" : string.Empty) @(CapturedAttributes.TryGetValue("class", out var classes) ? classes : string.Empty)"
+    @attributes="@(CapturedAttributes.Without("class"))">
+    <img class="w-auto h-full object-contain object-center" src="@thumbnail" />
+</div>
 
 @code 
 {
@@ -29,25 +24,37 @@ else
 
     private string? thumbnail;
 
-    protected override async Task OnParametersSetAsync()
+    private string? currentPageId;
+
+    protected override void OnAfterRender(bool firstRender)
     {
-        if (Page.Tag is not string key)
+        if (Page != null && currentPageId != Page.GetOrAssignId())
         {
-            key = Page.GetOrAssignId();
-        }
+            if (Page.Tag is not string key)
+            {
+                key = Page.GetOrAssignId();
+            }
 
-        if (ThumbnailCache.TryGetValue(key, out var cached))
-        {
-            thumbnail = cached;
-            return;
-        }
+            currentPageId = key;
 
-        using (BusyTracker.Track($"LoadPdfView.{key}"))
+            if (ThumbnailCache.TryGetValue(key, out var cached))
+            {
+                thumbnail = cached;
+                StateHasChanged(); // Trigger UI update
+                return;
+            }
+
+            Task.Run(() => GenerateThumbnail(key));
+        }
+    }
+
+    private async Task GenerateThumbnail(string key)
+    {
+        using (BusyTracker.Track($"LoadPdfView.{key}", StateHasChanged))
         {
             var pdfBytes = await Task.Run(Page.ExtractPageAsBytes);
-            thumbnail = await JSRuntime.InvokeAsync<string>("pdfRenderer.renderPageThumbnail", new object[] { pdfBytes });   
+            thumbnail = await JSRuntime.InvokeAsync<string>("pdfRenderer.renderPageThumbnail", new object[] { pdfBytes });
             ThumbnailCache[key] = thumbnail;
-            Console.WriteLine($"Thumbnail for {key} cached");
         }
     }
 }

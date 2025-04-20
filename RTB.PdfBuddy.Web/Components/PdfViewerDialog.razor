@@ -1,0 +1,53 @@
+﻿@using PdfSharpCore.Pdf
+
+@inherits RTBComponent
+
+@code {
+    [Parameter] public PdfPages Pages { get; set; } = default!;
+    [Parameter] public int PageIndex { get; set; }
+}
+
+<Grid Columns="auto 1fr auto" Rows="1fr" class="text-black gap-2 px-2 bg-white items-center">
+    <GridItem>
+        <button @onclick="PreviousPage">&lt;</button>
+    </GridItem>
+
+    <GridItem Column="2">
+        <PdfViewer Page="@CurrentPage" />
+    </GridItem>
+
+    <GridItem Column="3">
+        <button @onclick="NextPage">&gt;</button>
+    </GridItem>
+</Grid>
+
+@code {
+
+    protected override void OnParametersSet()
+    {
+        currentPageIndex = PageIndex;
+    }
+
+    private int _currentPageIndex = 0;
+    private int currentPageIndex
+    {
+        get => _currentPageIndex;
+        set
+        {
+            _currentPageIndex = Math.Clamp(value, 0, Pages.Count - 1);
+            StateHasChanged();
+        }
+    }
+
+    private PdfPage? CurrentPage => currentPageIndex >= Pages.Count || currentPageIndex < 0 ? null : Pages[currentPageIndex];
+
+    private void PreviousPage(MouseEventArgs args)
+    {
+        currentPageIndex--;
+    }
+
+    private void NextPage(MouseEventArgs args)
+    {
+        currentPageIndex++;
+    }
+}

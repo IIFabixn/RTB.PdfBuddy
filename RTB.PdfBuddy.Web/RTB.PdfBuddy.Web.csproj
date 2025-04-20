@@ -4,7 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-	  <NoWarn>CSS102</NoWarn>
+	<NoWarn>CSS102</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
