@@ -1,42 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>RTB.PdfBuddy.Web</title>
+        <base href="/" />
 
-<head>
-    <meta charset="utf-8" />
-    <title>RTB.PdfBuddy.Web</title>
-    <base href="/" />
-    <link href="manifest.webmanifest" rel="manifest" />
-    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
-    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
-    <link href="css/app.css" rel="stylesheet" />
-    <link href="css/tailwind.min.css" rel="stylesheet" />
-    <!-- <link href="RTB.PdfBuddy.Web.styles.css" rel="stylesheet" /> -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script src="_content/RTB.BlazorUI/js/dragdrop.js"></script>
-    <script src="js/pdfRenderer.js"></script>
-</head>
+        <link href="manifest.webmanifest" rel="manifest" />
+        <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
+        <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+        <link href="css/app.css" rel="stylesheet" />
+        <link href="css/tailwind.min.css" rel="stylesheet" />
+        <!-- <link href="RTB.PdfBuddy.Web.styles.css" rel="stylesheet" /> -->
 
-<body class="bg-zinc-900 text-white scrollbar-track-zinc-900 scrollbar-thumb-white">
-    <div id="app">
-        <div class="container mx-auto">
-            <div class="flex flex-col items-center justify-center h-screen">
-                <img src="_content/RTB.BlazorUI/rtb_logo.svg" class="h-32 w-32" />
-                <p class="text-lg">Welcome to the RTB.PdfBuddy Web Application!</p>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+        <script src="_content/RTB.BlazorUI/js/drag-drop.js"></script>
+        <script src="_content/RTB.BlazorUI/js/dialog-helper.js"></script>
+        <script src="js/pdfRenderer.js"></script>
+    </head>
+
+    <body class="bg-zinc-900 text-white scrollbar-track-zinc-900 scrollbar-thumb-white">
+        <div id="app">
+            <div class="container mx-auto">
+                <div class="flex flex-col items-center justify-center h-screen">
+                    <img src="_content/RTB.BlazorUI/rtb_logo.svg" alt="Refursed To Brew Log" title="" class="h-32 w-32" />
+                    <p class="text-lg">Welcome to the RTB.PdfBuddy Web Application!</p>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
-    </div>
-    <script src="_framework/blazor.webassembly.js"></script>
-    <script>navigator.serviceWorker.register('service-worker.js');</script>
-    <environment names="Development">
-        <script src="_framework/aspnetcore-browser-refresh.js"></script>
-    </environment>
-</body>
+        <div id="blazor-error-ui">
+            An unhandled error has occurred.
+            <a href="" class="reload">Reload</a>
+            <a class="dismiss">🗙</a>
+        </div>
 
+        <script src="_framework/blazor.webassembly.js"></script>
+        <script>navigator.serviceWorker.register('service-worker.js');</script>
+        <environment names="Development">
+            <script src="_framework/aspnetcore-browser-refresh.js"></script>
+        </environment>
+    </body>
 </html>

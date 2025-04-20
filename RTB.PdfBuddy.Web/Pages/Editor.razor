@@ -68,27 +68,29 @@
         <FlexLayout IsHorizontal class="gap-2 items-center">
             <DropZone class="grow" TObject="PdfPage[]" OnObjectDropped="@(pages => MovePagesToNewFile(pages))">
                 <FileDropInput Id="EditorNewDocumentDropArea" Multiple OnInput="FileAdded"
-                AcceptedTypes="@(new[] { MediaTypeNames.Application.Pdf })">
+                               AcceptedTypes="@(new[] { MediaTypeNames.Application.Pdf })">
                     <div class="border rounded min-h-18 flex flex-col p-2 justify-center text-gray-400 text-sm">
-                        <p class="max-w-lg">Create New Document by dragging pages of existing files into here or
-                            import new files by dragging them into here</p>
+                        <p class="max-w-lg">
+                            Create New Document by dragging pages of existing files into here or
+                            import new files by dragging them into here
+                        </p>
                     </div>
                 </FileDropInput>
             </DropZone>
-            <FlyoutMenu>
+            <FlyoutMenu Position="FlyoutMenu.FlyoutPosition.Up">
                 <Activator>
                     <div class="w-12 h-12 grid place-items-center"><span>[+]</span></div>
                 </Activator>
                 <ChildContent>
-                    <FlexLayout IsVertical>
-                        <button>
+                    <FlexLayout IsVertical class="gap-1 p-2 **:hover:text-red-400 *:cursor-pointer">
+                        <button type="button" @onclick="SplitAll">
                             <span class="text-black">Split</span>
                         </button>
-                        <button>
+                        <button type="button" @onclick="MergeAll">
                             <span class="text-black">Merge</span>
                         </button>
                         <button type="button">
-                            <span class="text-black">Save All</span>
+                            <span class="text-black whitespace-nowrap">Save All</span>
                         </button>
                     </FlexLayout>
                 </ChildContent>
@@ -244,6 +246,41 @@
 
         SelectedPages.Clear();
         StateHasChanged();
+    }
+
+    private bool CanSplit => Files.Count > 0 && Files.Any(doc => doc.PageCount > 1);
+    private void SplitAll()
+    {
+        if (!CanSplit) return;
+        // Create a copy of the Files collection to iterate over
+        var filesCopy = Files.ToList();
+
+        foreach (var file in filesCopy)
+        {
+            for (int i = 0; i < file.PageCount; i++)
+            {
+                var page = file.Pages[i];
+                MovePagesToNewFile(page);
+            }
+        }
+    }
+
+    private bool CanMerge => Files.Count > 1;
+    private void MergeAll()
+    {
+        if (!CanMerge) return;
+
+        var doc = Files.First();
+        // Create a copy of the Files collection to iterate over
+        var filesCopy = Files.ToList();
+        foreach (var file in filesCopy.Skip(1))
+        {
+            for(var i = 0; i < file.PageCount; i++)
+            {
+                var page = file.Pages[i];
+                MovePagesToFile(doc, page);
+            }
+        }
     }
 
     private void ToggleSelection(PdfPage page)

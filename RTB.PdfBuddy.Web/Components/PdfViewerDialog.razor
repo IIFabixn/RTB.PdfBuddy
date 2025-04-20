@@ -11,7 +11,7 @@
     <GridItem>
         @if (currentPageIndex > 0)
         {
-            <button @onclick="PreviousPage">&lt;</button>        
+            <button type="button" @onclick="PreviousPage">&lt;</button>        
         }
     </GridItem>
 
@@ -22,7 +22,7 @@
     <GridItem Column="3">
         @if(currentPageIndex < Pages.Count - 1)
         {
-            <button @onclick="NextPage">&gt;</button>        
+            <button type="button" @onclick="NextPage">&gt;</button>        
         }
     </GridItem>
 </Grid>
