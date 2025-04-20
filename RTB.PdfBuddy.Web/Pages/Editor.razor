@@ -75,9 +75,24 @@
                     </div>
                 </FileDropInput>
             </DropZone>
-            <button type="button">
-                Save All
-            </button>
+            <FlyoutMenu>
+                <Activator>
+                    <div class="w-12 h-12 grid place-items-center"><span>[+]</span></div>
+                </Activator>
+                <ChildContent>
+                    <FlexLayout IsVertical>
+                        <button>
+                            <span class="text-black">Split</span>
+                        </button>
+                        <button>
+                            <span class="text-black">Merge</span>
+                        </button>
+                        <button type="button">
+                            <span class="text-black">Save All</span>
+                        </button>
+                    </FlexLayout>
+                </ChildContent>
+            </FlyoutMenu>
         </FlexLayout>
     </GridItem>
 </Grid>
