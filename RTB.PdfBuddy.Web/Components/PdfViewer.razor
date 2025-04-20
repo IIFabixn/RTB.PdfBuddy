@@ -13,7 +13,7 @@
     [Parameter] public PdfPage? Page { get; set; }
 }
 
-<div class="grid place-items-center @(thumbnail is null ? "animate-pulse" : string.Empty) @(CapturedAttributes.TryGetValue("class", out var classes) ? classes : string.Empty)"
+<div class="@(thumbnail is null ? "animate-pulse" : string.Empty) @(CapturedAttributes.TryGetValue("class", out var classes) ? classes : string.Empty)"
     @attributes="@(CapturedAttributes.Without("class"))">
     <img class="w-auto h-full object-contain object-center" src="@thumbnail" />
 </div>

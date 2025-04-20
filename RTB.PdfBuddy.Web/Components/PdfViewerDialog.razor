@@ -9,7 +9,10 @@
 
 <Grid Columns="auto 1fr auto" Rows="1fr" class="text-black gap-2 px-2 bg-white items-center">
     <GridItem>
-        <button @onclick="PreviousPage">&lt;</button>
+        @if (currentPageIndex > 0)
+        {
+            <button @onclick="PreviousPage">&lt;</button>        
+        }
     </GridItem>
 
     <GridItem Column="2">
@@ -17,7 +20,10 @@
     </GridItem>
 
     <GridItem Column="3">
-        <button @onclick="NextPage">&gt;</button>
+        @if(currentPageIndex < Pages.Count - 1)
+        {
+            <button @onclick="NextPage">&gt;</button>        
+        }
     </GridItem>
 </Grid>
 
