@@ -32,12 +32,20 @@
         </FlexLayout>
 
         <FileDropInput Id="IndexFileDrop"
-        Multiple
-        AcceptedTypes="@(new[] { MediaTypeNames.Application.Pdf })"
-        OnInput="ImportFiles"
-        class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
+            Multiple
+            AcceptedTypes="@(new[] { MediaTypeNames.Application.Pdf })"
+            OnInput="ImportFiles"
+            class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
             <h2 class="text-center">Drag and drop your PDF files here or click to select files.</h2>
         </FileDropInput>
+        <TabGroup>
+            <TabItem Title="Merge">
+                <p>Merge Documents</p>
+            </TabItem>
+            <TabItem Title="Split">
+                <p>Split Documents</p>
+            </TabItem>
+        </TabGroup>
     </FlexLayout>
 </FlexLayout>
 
