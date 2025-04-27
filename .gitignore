@@ -484,3 +484,4 @@ $RECYCLE.BIN/
 *.swp
 RTB.PdfBuddy.Web/Tailwind
 *.min.css
+.publish

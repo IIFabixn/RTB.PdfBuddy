@@ -11,9 +11,10 @@
 @using System.Net.Mime
 
 @inject IJSRuntime JSRuntime
+@inject IBusyTracker BusyTracker
 @inject NavigationManager NavigationManager
 @inject DataNavigationService DataNavigationService
-@inject BusyTracker BusyTracker
+
 @inherits RTBComponent
 
 <FlexLayout IsVertical>
@@ -32,10 +33,10 @@
         </FlexLayout>
 
         <FileDropInput Id="IndexFileDrop"
-            Multiple
-            AcceptedTypes="@(new[] { MediaTypeNames.Application.Pdf })"
-            OnInput="ImportFiles"
-            class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
+        Multiple
+        AcceptedTypes="@(new[] { MediaTypeNames.Application.Pdf })"
+        OnInput="ImportFiles"
+        class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
             <h2 class="text-center">Drag and drop your PDF files here or click to select files.</h2>
         </FileDropInput>
         <TabGroup>
@@ -54,13 +55,11 @@
     {
         if (files.Length == 0) return;
 
-        using (BusyTracker.Track("ImportingFiles"))
-        {
-            var tasks = files.Select(file => Task.Run(file.LoadPdfDocument));
+        using var busy = BusyTracker.Track("ImportingFiles");
+        var tasks = files.Select(file => Task.Run(file.LoadPdfDocument));
 
-            var documents = await Task.WhenAll(tasks);
+        var documents = await Task.WhenAll(tasks);
 
-            DataNavigationService.NavigateTo("editor", parameter: [new ("files", documents)]);
-        }
+        DataNavigationService.NavigateTo("editor", parameter: [new ("files", documents)]);
     }
 }

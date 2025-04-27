@@ -21,6 +21,16 @@ namespace RTB.PdfBuddy.Web.Extensions
             return -1;
         }
 
+        public static PdfPage[] GetPagesAsArray(this PdfDocument doc)
+        {
+            var pages = new PdfPage[doc.PageCount];
+            for (int i = 0; i < doc.PageCount; i++)
+            {
+                pages[i] = doc.Pages[i];
+            }
+            return pages;
+        }
+
         public static byte[] ExtractPageAsBytes(this PdfPage page)
         {
             // Create a new document

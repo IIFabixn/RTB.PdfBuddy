@@ -1,6 +1,5 @@
 pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 window.pdfRenderer = {
-
     renderPageThumbnail: async function (arrayBuffer) {
         const pdfData = new Uint8Array(arrayBuffer);
         const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;

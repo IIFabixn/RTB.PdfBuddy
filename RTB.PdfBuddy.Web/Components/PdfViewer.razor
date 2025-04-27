@@ -5,7 +5,7 @@
 @using System.Collections.Concurrent
 
 @inject IJSRuntime JSRuntime
-@inject BusyTracker BusyTracker
+@inject IBusyTracker BusyTracker
 
 @inherits RTBComponent
 
@@ -26,7 +26,7 @@
 
     private string? currentPageId;
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (Page != null && currentPageId != Page.GetOrAssignId())
         {
@@ -44,7 +44,7 @@
                 return;
             }
 
-            Task.Run(() => GenerateThumbnail(key));
+            await GenerateThumbnail(key);
         }
     }
 
@@ -52,12 +52,10 @@
     {
         if (Page is null) return;
 
-        using (BusyTracker.Track($"LoadPdfView.{key}", StateHasChanged))
-        {
-            await Task.Delay(2000);
-            var pdfBytes = await Task.Run(Page.ExtractPageAsBytes);
-            thumbnail = await JSRuntime.InvokeAsync<string>("pdfRenderer.renderPageThumbnail", new object[] { pdfBytes });
-            ThumbnailCache[key] = thumbnail;
-        }
+        using var busy = BusyTracker.Track($"LoadPdfView.{key}");
+        var pdfBytes = await Task.Run(Page.ExtractPageAsBytes);
+        thumbnail = await JSRuntime.InvokeAsync<string>("pdfRenderer.renderPageThumbnail", new object[] { pdfBytes });
+        ThumbnailCache[key] = thumbnail;
+        StateHasChanged();
     }
 }

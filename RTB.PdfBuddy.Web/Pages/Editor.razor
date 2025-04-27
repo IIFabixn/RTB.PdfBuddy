@@ -11,11 +11,12 @@
 @using RTB.BlazorUI.Services.DragDrop.Components
 @using RTB.PdfBuddy.Web.Extensions
 @using System.Net.Mime
+@using System.IO.Compression
 
 @inject ILogger<Editor> Logger
 @inject IJSRuntime JSRuntime
 @inject DataNavigationService DataNavigationService
-@inject BusyTracker BusyTracker
+@inject IBusyTracker BusyTracker
 @inject IDialogService DialogService
 
 @inherits RTBComponent
@@ -29,14 +30,22 @@
                         <button class="text-red-300 px-0.5 self-end cursor-pointer" @onclick="() => RemoveFile(file)">x</button>
                         <div class="grow overflow-auto">
                             <input type="text max-w-full"
-                            class="border-b min-w-xs outline-none px-1 self-start max-w-full"
-                            placeholder="File name"
-                            style="field-sizing: content;"
-                            @bind-value="file.Info.Title" />
+                                class="border-b min-w-xs outline-none px-1 self-start max-w-full"
+                                placeholder="File name"
+                                style="field-sizing: content;"
+                                @bind-value="file.Info.Title"
+                                @bind-value:event="oninput"
+                                @onchange="@((e) => OnFileNameChanged(file, e.Value?.ToString() ?? string.Empty))" />
                         </div>
-                        <button class="justify-self-end">Save</button>
+                        <button class="justify-self-end" @onclick="() => Save(file)">Save</button>
                     </FlexLayout>
                     <FlexLayout IsHorizontal class="gap-1 overflow-auto scrollbar">
+                        <FlexLayout IsVertical>
+                            <button @onclick="() => Split(file)">Split</button>
+                            <DraggableItem TData="PdfPage[]" ItemData="@file.GetPagesAsArray()">
+                                DRAG
+                            </DraggableItem>
+                        </FlexLayout>
                         @for (var pageIndex = 0; pageIndex < file.PageCount; pageIndex++)
                         {
                             var capturedIndex = pageIndex;
@@ -68,7 +77,7 @@
         <FlexLayout IsHorizontal class="gap-2 items-center">
             <DropZone class="grow" TObject="PdfPage[]" OnObjectDropped="@(pages => MovePagesToNewFile(pages))">
                 <FileDropInput Id="EditorNewDocumentDropArea" Multiple OnInput="FileAdded"
-                               AcceptedTypes="@(new[] { MediaTypeNames.Application.Pdf })">
+                AcceptedTypes="@(new[] { MediaTypeNames.Application.Pdf })">
                     <div class="border rounded min-h-18 flex flex-col p-2 justify-center text-gray-400 text-sm">
                         <p class="max-w-lg">
                             Create New Document by dragging pages of existing files into here or
@@ -77,7 +86,7 @@
                     </div>
                 </FileDropInput>
             </DropZone>
-            <FlyoutMenu Position="FlyoutMenu.FlyoutPosition.Up">
+            <FlyoutMenu @ref="ActionFlyout" Position="FlyoutMenu.FlyoutPosition.Up">
                 <Activator>
                     <div class="w-12 h-12 grid place-items-center"><span>[+]</span></div>
                 </Activator>
@@ -89,7 +98,7 @@
                         <button type="button" @onclick="MergeAll">
                             <span class="text-black">Merge</span>
                         </button>
-                        <button type="button">
+                        <button type="button" @onclick="SaveAll">
                             <span class="text-black whitespace-nowrap">Save All</span>
                         </button>
                     </FlexLayout>
@@ -101,7 +110,8 @@
 
 @code {
     public List<PdfDocument> Files { get; set; } = [];
-    private HashSet<PdfPage> SelectedPages { get; set; } = new();
+    private HashSet<PdfPage> SelectedPages { get; set; } = [];
+    private FlyoutMenu ActionFlyout { get; set; } = default!;
 
     protected override void OnInitialized()
     {
@@ -120,14 +130,18 @@
 
     private async void FileAdded(IBrowserFile[] files)
     {
-        using (BusyTracker.Track("FileAdded", StateHasChanged))
+        using var busy = BusyTracker.Track("FileAdded");
+        var loadTasks = files.Select(file => Task.Run(file.LoadPdfDocument));
+        var loadedFiles = await Task.WhenAll(loadTasks);
+
+        foreach (var file in loadedFiles)
         {
-            var loadTasks = files.Select(file => Task.Run(file.LoadPdfDocument));
-            var loadedFiles = await Task.WhenAll(loadTasks);
-            Files.AddRange(loadedFiles);
-            Logger.LogDebug($"Added {files.Length} files to editor");
-            StateHasChanged();
+            file.Info.Title = GetUniqueFileName(file.Info.Title ?? "New Document");
+            Files.Add(file);
         }
+
+        Logger.LogDebug($"Added {files.Length} files to editor");
+        StateHasChanged();
     }
 
     private void MovePagesToFile(PdfDocument file, params PdfPage[] pages)
@@ -164,7 +178,7 @@
     {
         // Create a new empty PDF document
         var doc = new PdfDocument();
-        doc.Info.Title = "New Document";
+        doc.Info.Title = GetUniqueFileName("New Document");
 
         // We'll map old tags to maintain IDs
         var pageTags = new List<string>();
@@ -257,12 +271,23 @@
 
         foreach (var file in filesCopy)
         {
-            for (int i = 0; i < file.PageCount; i++)
-            {
-                var page = file.Pages[i];
-                MovePagesToNewFile(page);
-            }
+            Split(file);
         }
+        ActionFlyout.CloseMenu();
+        StateHasChanged();
+    }
+
+    private void Split(PdfDocument doc)
+    {
+        if (doc.PageCount <= 1) return;
+
+        for (int i = doc.PageCount - 1; i >= 0; i--) // Iterate backward
+        {
+            var page = doc.Pages[i];
+            MovePagesToNewFile(page);
+        }
+
+        StateHasChanged();
     }
 
     private bool CanMerge => Files.Count > 1;
@@ -275,12 +300,15 @@
         var filesCopy = Files.ToList();
         foreach (var file in filesCopy.Skip(1))
         {
-            for(var i = 0; i < file.PageCount; i++)
+            for (var i = file.PageCount - 1; i >= 0; i--) // Iterate backward
             {
                 var page = file.Pages[i];
                 MovePagesToFile(doc, page);
             }
         }
+
+        ActionFlyout.CloseMenu();
+        StateHasChanged();
     }
 
     private void ToggleSelection(PdfPage page)
@@ -294,5 +322,62 @@
     private void ShowFullscren(PdfPage page)
     {
         DialogService.ShowAsync<PdfViewerDialog>(page.Owner.Info.Title, new() { [nameof(PdfViewerDialog.Pages)] = page.Owner.Pages, [nameof(PdfViewerDialog.PageIndex)] = page.Owner.GetPageIndex(page) });
+    }
+
+    private async Task Save(PdfDocument doc)
+    {
+        using var memoryStream = new MemoryStream();
+        doc.Save(memoryStream, false); // Save the document to the stream
+        memoryStream.Position = 0; // Reset the stream position
+
+        var fileName = doc.Info.Title ?? "Document.pdf";
+        await JSRuntime.InvokeVoidAsync("exportFile", fileName, memoryStream.ToArray());
+    }
+
+    private async Task SaveAll()
+    {
+        using var busy = BusyTracker.Track("SaveAll");
+        using var zipStream = new MemoryStream();
+        using (var archive = new ZipArchive(zipStream, System.IO.Compression.ZipArchiveMode.Create, true))
+        {
+            foreach (var doc in Files)
+            {
+                var entryName = string.IsNullOrWhiteSpace(doc.Info.Title) ? "Document.pdf" : $"{doc.Info.Title}.pdf";
+                var zipEntry = archive.CreateEntry(entryName, System.IO.Compression.CompressionLevel.Fastest);
+
+                using var entryStream = zipEntry.Open();
+                using var pdfStream = new MemoryStream();
+                doc.Save(pdfStream, false); // Save the PDF document to a memory stream
+                pdfStream.Position = 0; // Reset the stream position
+                await pdfStream.CopyToAsync(entryStream); // Copy the PDF stream to the ZIP entry
+            }
+        }
+
+        zipStream.Position = 0; // Reset the ZIP stream position
+        await JSRuntime.InvokeVoidAsync("exportFile", "Documents.zip", zipStream.ToArray());
+
+        ActionFlyout.CloseMenu();
+        StateHasChanged();
+    }
+
+    private string GetUniqueFileName(string baseName)
+    {
+        var existingNames = Files.Select(f => f.Info.Title).ToHashSet();
+        var uniqueName = baseName;
+        var counter = 1;
+
+        while (existingNames.Contains(uniqueName))
+        {
+            uniqueName = $"{baseName} ({counter++})";
+        }
+
+        return uniqueName;
+    }
+
+    private void OnFileNameChanged(PdfDocument file, string newName)
+    {
+        var uniqueName = GetUniqueFileName(newName);
+        file.Info.Title = uniqueName;
+        StateHasChanged();
     }
 }
