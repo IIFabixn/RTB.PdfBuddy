@@ -72,7 +72,7 @@
       "command": "bash",
       "args": [
         "-c",
-        "lsof -ti :5217 | xargs kill -9"
+        " -ti :5217 | xargs kill -9"
       ],
       "problemMatcher": [],
       "presentation": {

@@ -40,10 +40,9 @@
                         <button class="justify-self-end" @onclick="() => Save(file)">Save</button>
                     </FlexLayout>
                     <FlexLayout IsHorizontal class="gap-1 overflow-auto scrollbar">
-                        <FlexLayout IsVertical>
-                            <button @onclick="() => Split(file)">Split</button>
+                        <FlexLayout IsVertical class="justify-around">
                             <DraggableItem TData="PdfPage[]" ItemData="@file.GetPagesAsArray()">
-                                DRAG
+                            <img src="img/drag.svg" alt="Drag File Handle" class="h-10 w-6" />
                             </DraggableItem>
                         </FlexLayout>
                         @for (var pageIndex = 0; pageIndex < file.PageCount; pageIndex++)
@@ -88,18 +87,18 @@
             </DropZone>
             <FlyoutMenu @ref="ActionFlyout" Position="FlyoutMenu.FlyoutPosition.Up">
                 <Activator>
-                    <div class="w-12 h-12 grid place-items-center"><span>[+]</span></div>
+                    <div class="w-12 h-12 grid place-items-center"><img src="img/action.svg" /></div>
                 </Activator>
                 <ChildContent>
                     <FlexLayout IsVertical class="gap-1 p-2 **:hover:text-red-400 *:cursor-pointer">
                         <button type="button" @onclick="SplitAll">
-                            <span class="text-black">Split</span>
+                            <img src="img/split.svg" alt="Split all Files" title="Split All Files" />
                         </button>
                         <button type="button" @onclick="MergeAll">
-                            <span class="text-black">Merge</span>
+                            <img src="img/merge.svg" alt="Merge all Files" title="Merge all file" />
                         </button>
                         <button type="button" @onclick="SaveAll">
-                            <span class="text-black whitespace-nowrap">Save All</span>
+                            <img src="img/save.svg" alt="Save all Files" title="Save all Files" />
                         </button>
                     </FlexLayout>
                 </ChildContent>
@@ -331,7 +330,7 @@
         memoryStream.Position = 0; // Reset the stream position
 
         var fileName = doc.Info.Title ?? "Document.pdf";
-        await JSRuntime.InvokeVoidAsync("exportFile", fileName, memoryStream.ToArray());
+        await JSRuntime.InvokeVoidAsync("exportFile", $"{(fileName)}.pdf", memoryStream.ToArray());
     }
 
     private async Task SaveAll()
@@ -342,7 +341,7 @@
         {
             foreach (var doc in Files)
             {
-                var entryName = string.IsNullOrWhiteSpace(doc.Info.Title) ? "Document.pdf" : $"{doc.Info.Title}.pdf";
+                var entryName = string.IsNullOrWhiteSpace(doc.Info.Title) ? "Document.pdf" : $"{(doc.Info.Title)}.pdf";
                 var zipEntry = archive.CreateEntry(entryName, System.IO.Compression.CompressionLevel.Fastest);
 
                 using var entryStream = zipEntry.Open();

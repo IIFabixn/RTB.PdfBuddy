@@ -21,7 +21,6 @@
               "--verbose" // Let's us confirm browser connects with hot reload capabilities
           ],
           "preLaunchTask": "build web", // Ensure we don't watch an unbuilt site
-          "postDebugTask": "Kill Port 5217"
       },
       {
           "name": "Attach",
@@ -29,12 +28,13 @@
           "request": "attach",
           "cwd": "${workspaceFolder}/RTB.PdfBuddy.Web",
           "url": "http://localhost:5217",  // Tell launch where to find site
-          "timeout": 120000, // Allows time for the site to launch
+          "timeout": 120000, // Allows time for the site to launch (2min)
       }
   ],
   "compounds": [
       {
           "name": "Debug with Hot Reload",
+          "preLaunchTask": "Kill Port 5217",
           "configurations": [ "Watch", "Attach" ],
           "stopAll": true,
       }

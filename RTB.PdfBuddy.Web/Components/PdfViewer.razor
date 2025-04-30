@@ -3,6 +3,7 @@
 @using RTB.BlazorUI.Services.BusyTracker
 @using RTB.PdfBuddy.Web.Extensions
 @using System.Collections.Concurrent
+@using static RTB.BlazorUI.Services.BusyTracker.BusyTracker
 
 @inject IJSRuntime JSRuntime
 @inject IBusyTracker BusyTracker
@@ -20,13 +21,14 @@
 
 @code 
 {
-    private static readonly Dictionary<string, string> ThumbnailCache = new();
+    private static readonly SemaphoreSlim thumbnailSemaphore = new(8);
+    private static readonly ConcurrentDictionary<string, string> ThumbnailCache = new();
 
     private string? thumbnail;
 
     private string? currentPageId;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (Page != null && currentPageId != Page.GetOrAssignId())
         {
@@ -41,21 +43,30 @@
             {
                 thumbnail = cached;
                 StateHasChanged(); // Trigger UI update
-                return;
+                return Task.CompletedTask;
             }
 
-            await GenerateThumbnail(key);
+            GenerateThumbnail(key);
         }
+        
+        return Task.CompletedTask;
     }
 
     private async Task GenerateThumbnail(string key)
     {
         if (Page is null) return;
 
+        await thumbnailSemaphore.WaitAsync();
         using var busy = BusyTracker.Track($"LoadPdfView.{key}");
-        var pdfBytes = await Task.Run(Page.ExtractPageAsBytes);
+        var bytes = await Task.Run(Page.ExtractPageAsBytes);
+        await RenderPageThumbnail(key, bytes);
+    }
+
+    private async Task RenderPageThumbnail(string key, byte[] pdfBytes)
+    {
         thumbnail = await JSRuntime.InvokeAsync<string>("pdfRenderer.renderPageThumbnail", new object[] { pdfBytes });
         ThumbnailCache[key] = thumbnail;
+        thumbnailSemaphore.Release();
         StateHasChanged();
     }
 }
