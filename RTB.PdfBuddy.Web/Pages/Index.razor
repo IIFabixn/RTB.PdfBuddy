@@ -5,15 +5,18 @@
 @using RTB.BlazorUI.Extensions
 @using RTB.BlazorUI.Services.BusyTracker
 @using RTB.BlazorUI.Services.DataNavigationService
-@using RTB.PdfBuddy.Web.Extensions
+@using RTB.PdfBuddy.Shared
 @using RTB.BlazorUI.Services.DragDrop.Components
 @using Microsoft.AspNetCore.Components.Sections
 @using System.Net.Mime
+@using System.IO.Compression
+@using RTB.PdfBuddy.Shared.Extensions
 
 @inject IJSRuntime JSRuntime
 @inject IBusyTracker BusyTracker
 @inject NavigationManager NavigationManager
 @inject DataNavigationService DataNavigationService
+@inject PdfEditor PdfEditor
 
 @inherits RTBComponent
 
@@ -31,28 +34,102 @@
             class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
             <h2 class="text-center">Drag and drop your PDF files here or click to select files.</h2>
         </FileDropInput>
-        <h2>Features</h2>
-        <TabGroup class="w-full">
-            <TabItem Title="Merge">
+        <h2>Quick Features</h2>
+        <Grid Columns="1fr 1fr" class="gap-4">
+            <GridItem>
+                <FileDropInput Id="MergeAllDrop"
+                    Multiple
+                    AcceptedTypes="@(new[] { MediaTypeNames.Application.Pdf })"
+                    OnInput="MergeAll"
+                    class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
                 <p>Merge Documents</p>
-            </TabItem>
-            <TabItem Title="Split">
-                <p>Split Documents</p>
-            </TabItem>
-        </TabGroup>
+                    <h2 class="text-center">Drag and drop your PDF files here or click to select files.</h2>
+                </FileDropInput>
+            </GridItem>
+            <GridItem>
+                <FileDropInput Id="SplitAllDrop"
+                    Multiple
+                    AcceptedTypes="@(new[] { MediaTypeNames.Application.Pdf })"
+                    OnInput="SplitAll"
+                    class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
+                    <p>Split Documents</p>
+                    <h2 class="text-center">Drag and drop your PDF files here or click to select files.</h2>
+                </FileDropInput>
+            </GridItem>
+        </Grid>
     </FlexLayout>
 </FlexLayout>
 
 @code {
+    private async Task<PdfDocument[]> ReadDocuments(params IBrowserFile[] files)
+    {
+        if (files.Length == 0) return [];
+        using var busy = BusyTracker.Track("ReadingDocuments");
+        var tasks = files.Select(file => Task.Run(file.LoadPdfDocument));
+
+        return await Task.WhenAll(tasks);
+    }
+
     private async Task ImportFiles(IBrowserFile[] files)
     {
         if (files.Length == 0) return;
 
         using var busy = BusyTracker.Track("ImportingFiles");
-        var tasks = files.Select(file => Task.Run(file.LoadPdfDocument));
 
-        var documents = await Task.WhenAll(tasks);
+        var documents = await ReadDocuments(files);
 
         DataNavigationService.NavigateTo("editor", parameter: [new ("files", documents)]);
+    }
+
+    private async Task MergeAll(IBrowserFile[] files)
+    {
+        if (files.Length == 0) return;
+        if (files.Length == 1)
+        {
+            await ImportFiles(files);
+            return;
+        }
+
+        using var busy = BusyTracker.Track("MergeAllFiles");
+
+        var documents = await ReadDocuments(files);
+        PdfEditor.AddFileRange(documents);
+        PdfEditor.MergeAll();
+        var doc = PdfEditor.Files[0];
+
+        using var memoryStream = new MemoryStream();
+        doc.Save(memoryStream, false); // Save the document to the stream
+        memoryStream.Position = 0; // Reset the stream position
+
+        var fileName = doc.Info.Title ?? "Document.pdf";
+        await JSRuntime.InvokeVoidAsync("exportFile", $"{(fileName)}.pdf", memoryStream.ToArray());
+    }
+
+    private async Task SplitAll(params IBrowserFile[] files)
+    {
+        if (files.Length == 0) return;
+
+        using var busy = BusyTracker.Track("SplittingAll");
+        var documents = await ReadDocuments(files);
+        PdfEditor.AddFileRange(documents);
+
+        using var zipStream = new MemoryStream();
+        using (var archive = new ZipArchive(zipStream, System.IO.Compression.ZipArchiveMode.Create, true))
+        {
+            foreach (var doc in PdfEditor.Files)
+            {
+                var entryName = string.IsNullOrWhiteSpace(doc.Info.Title) ? "Document.pdf" : $"{(doc.Info.Title)}.pdf";
+                var zipEntry = archive.CreateEntry(entryName, System.IO.Compression.CompressionLevel.Fastest);
+
+                using var entryStream = zipEntry.Open();
+                using var pdfStream = new MemoryStream();
+                doc.Save(pdfStream, false); // Save the PDF document to a memory stream
+                pdfStream.Position = 0; // Reset the stream position
+                await pdfStream.CopyToAsync(entryStream); // Copy the PDF stream to the ZIP entry
+            }
+        }
+
+        zipStream.Position = 0; // Reset the ZIP stream position
+        await JSRuntime.InvokeVoidAsync("exportFile", "Documents.zip", zipStream.ToArray());
     }
 }

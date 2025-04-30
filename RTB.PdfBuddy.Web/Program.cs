@@ -8,6 +8,7 @@ using RTB.BlazorUI.Services.BusyTracker;
 using RTB.BlazorUI.Services.Dialog;
 using System.Runtime.CompilerServices;
 using RTB.PdfBuddy.Web.Components;
+using RTB.PdfBuddy.Shared;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -21,6 +22,7 @@ builder.Services.AddSingleton<IDragDropService, DragDropService>();
 builder.Services.AddSingleton<DataNavigationService>();
 builder.Services.AddSingleton<IBusyTracker, BusyTracker>();
 builder.Services.AddSingleton<IDialogService, DialogService>();
+builder.Services.AddSingleton<PdfEditor>();
 
 
 var app = builder.Build();

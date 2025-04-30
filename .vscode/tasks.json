@@ -6,37 +6,37 @@
       "command": "dotnet",
       "type": "process",
       "args": [
-          "build",
-          "${workspaceFolder}/RTB.PdfBuddy.Web/RTB.PdfBuddy.Web.csproj",
-          "/property:GenerateFullPaths=true",
-          "/consoleloggerparameters:NoSummary"
+        "build",
+        "${workspaceFolder}/RTB.PdfBuddy.Web/RTB.PdfBuddy.Web.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
       ],
       "problemMatcher": "$msCompile"
     },
     {
-        "label": "publish web",
-        "command": "dotnet",
-        "type": "process",
-        "args": [
-            "publish",
-            "${workspaceFolder}/RTB.PdfBuddy.Web/RTB.PdfBuddy.Web.csproj",
-            "/property:GenerateFullPaths=true",
-            "/consoleloggerparameters:NoSummary"
-        ],
-        "problemMatcher": "$msCompile"
+      "label": "publish web",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "publish",
+        "${workspaceFolder}/RTB.PdfBuddy.Web/RTB.PdfBuddy.Web.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
     },
     {
-        "label": "watch web",
-        "command": "dotnet",
-        "type": "process",
-        "args": [
-            "watch",
-            "run",
-            "${workspaceFolder}/RTB.PdfBuddy.Web/RTB.PdfBuddy.Web.csproj",
-            "/property:GenerateFullPaths=true",
-            "/consoleloggerparameters:NoSummary"
-        ],
-        "problemMatcher": "$msCompile",
+      "label": "watch web",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "watch",
+        "run",
+        "${workspaceFolder}/RTB.PdfBuddy.Web/RTB.PdfBuddy.Web.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
     },
     {
       "label": "Tailwind Watch",
@@ -69,12 +69,18 @@
     {
       "label": "Kill Port 5217",
       "type": "shell",
-      "command": "bash",
-      "args": [
-        "-c",
-        " -ti :5217 | xargs kill -9"
-      ],
-      "problemMatcher": [],
+      "osx": {
+        "command": "lsof",
+        "args": [
+          "-ti",
+          ":5217",
+          "|",
+          "xargs",
+          "kill",
+          "-9"
+        ],
+        "problemMatcher": []
+      },
       "presentation": {
         "reveal": "always",
         "panel": "shared",
@@ -83,7 +89,8 @@
       "group": {
         "kind": "none",
         "isDefault": false
-      }
+      },
+      "problemMatcher": []
     }
   ]
 }
