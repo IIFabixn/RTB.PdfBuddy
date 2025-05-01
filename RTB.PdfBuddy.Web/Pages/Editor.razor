@@ -92,7 +92,7 @@
                     <div class="w-12 h-12 grid place-items-center"><img src="img/action.svg" /></div>
                 </Activator>
                 <ChildContent>
-                    <FlexLayout IsVertical class="gap-1 p-2 **:hover:text-red-400 *:cursor-pointer">
+                    <FlexLayout IsVertical class="gap-1 items-center **:hover:text-red-400 *:cursor-pointer w-16">
                         <button type="button" @onclick="() => StateAction(PdfEditor.SplitAll)">
                             <img src="img/split.svg" alt="Split all Files" title="Split All Files" />
                         </button>
@@ -100,7 +100,7 @@
                             <img src="img/merge.svg" alt="Merge all Files" title="Merge all file" />
                         </button>
                         <button type="button" @onclick="SaveAll">
-                            <img src="img/save.svg" alt="Save all Files" title="Save all Files" />
+                            <img src="img/download.svg" alt="Save all Files" title="Save all Files" />
                         </button>
                     </FlexLayout>
                 </ChildContent>
