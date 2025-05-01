@@ -72,12 +72,19 @@
       "osx": {
         "command": "lsof",
         "args": [
-          "-ti",
+          "-iTCP",
+          "-sTCP:LISTEN",
+          "-P",
+          "|",
+          "grep",
           ":5217",
+          "|",
+          "awk",
+          "{print $2}",
           "|",
           "xargs",
           "kill",
-          "-9"
+          "-9",
         ],
         "problemMatcher": []
       },
