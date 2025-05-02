@@ -16,13 +16,13 @@
 }
 
 <CascadingValue Value="this">
-    <FlexLayout IsVertical FullHeight class="page flex flex-col bg-zinc-800 text-white">
+    <FlexLayout IsVertical FullHeight class="page flex flex-col bg-zinc-50 dark:bg-zinc-800 text-white">
         <nav class="flex flex-row justify-between p-4 container self-center items-center">
             <NavLink href="">
                 <FlexLayout IsHorizontal class="items-center">
-                    <img src="_content/RTB.BlazorUI/rtb_logo.svg" alt="Refused to Brew Logo" title="" class="w-18 h-12" />
-                    <img src="img/pdfbuddy_logo.svg" alt="Pdf Logo mascot" title="" class="h-12 w-12" />
-                    <span>Buddy</span>
+                    <img src="_content/RTB.BlazorUI/rtb_logo.svg" alt="Refused to Brew Logo" title="" width="72" height="72" class="fill-black dark:fill-white" />
+                    <img src="img/pdfbuddy_logo.svg" alt="Pdf Logo mascot" title="" class="h-12 w-12 fill-black dark:fill-white" />
+                    <span class="text-black dark:text-white">Buddy</span>
                 </FlexLayout>
             </NavLink>
             <ul class="flex flex-row gap-4 items-center">
@@ -33,11 +33,8 @@
                 }
                 <li class="hover:text-slate-400">
                     <NavLink href="infos" title="Impressum and more">
-                        <img src="_content/RTB.BlazorUI/svg/info.svg" alt="Refused to Brew Logo" class="h-6 w-6" />
+                        <img src="_content/RTB.BlazorUI/svg/info.svg" alt="Refused to Brew Logo" class="h-6 w-6 fill-black dark:fill-white" />
                     </NavLink>
-                </li>
-                <li>
-                    <button>SUN</button>
                 </li>
                 <li>
                     <a href="https://www.buymeacoffee.com/RefusedToBrew" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="width: 217px !important;"></a>

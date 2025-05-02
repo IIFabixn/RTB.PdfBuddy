@@ -23,7 +23,7 @@
 
 @inherits RTBComponent
 
-<Grid FullHeight Rows="1fr auto" class="container self-center p-4 bg-zinc-900 rounded-t gap-4">
+<Grid FullHeight Rows="1fr auto" class="container self-center gap-4  p-8 bg-zinc-200 dark:bg-zinc-950 rounded-t box-border shadow">
     <GridItem Row="1" class="min-w-0 min-h-0 overflow-auto">
         <CollectionList IsVertical FullHeight Items="@PdfEditor.Files" TItem="PdfDocument" Context="file" class="gap-4">
             <ItemTemplate>
@@ -31,8 +31,8 @@
                     <FlexLayout IsHorizontal class="gap-2 items-center">
                         <button class="text-red-300 px-0.5 self-end cursor-pointer" @onclick="() => RemoveFile(file)">x</button>
                         <div class="grow overflow-auto">
-                            <input type="text max-w-full"
-                                class="border-b min-w-xs outline-none px-1 self-start max-w-full"
+                            <input type="text"
+                                class="border-b min-w-xs outline-none px-1 self-start max-w-full text-black dark:text-white"
                                 placeholder="File name"
                                 style="field-sizing: content;"
                                 @bind-value="file.Info.Title"
@@ -44,7 +44,7 @@
                     <FlexLayout IsHorizontal class="gap-1 overflow-auto scrollbar">
                         <FlexLayout IsVertical class="justify-around shrink-0">
                             <DraggableItem TData="PdfPage[]" ItemData="@file.GetPagesAsArray()">
-                            <Icon IconName="Drag" />
+                                <Icon IconName="Drag" Width="24" Height="24" class="text-black dark:text-white" />
                             </DraggableItem>
                         </FlexLayout>
                         @for (var pageIndex = 0; pageIndex < file.PageCount; pageIndex++)
@@ -94,15 +94,15 @@
                     </div>
                 </Activator>
                 <ChildContent>
-                    <FlexLayout IsVertical class="gap-1 items-center **:hover:text-red-400 *:cursor-pointer w-16">
+                    <FlexLayout IsVertical class="gap-1 items-center *:cursor-pointer w-16">
                         <button type="button" @onclick="() => StateAction(PdfEditor.SplitAll)">
-                            <Icon IconName="Split" />
+                            <Icon IconName="Split" Width="24" Height="24" class="stroke-black dark:stroke-white hover:stroke-red-400" />
                         </button>
                         <button type="button" @onclick="() => StateAction(PdfEditor.MergeAll)">
-                            <Icon IconName="Merge" />
+                            <Icon IconName="Merge" Width="24" Height="24" class="stroke-black dark:stroke-white hover:stroke-red-400" />
                         </button>
                         <button type="button" @onclick="SaveAll">
-                            <Icon IconName="Download" />
+                            <Icon IconName="Download" Width="24" Height="24" class="stroke-black dark:stroke-white hover:stroke-red-400" />
                         </button>
                     </FlexLayout>
                 </ChildContent>

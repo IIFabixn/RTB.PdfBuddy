@@ -78,5 +78,6 @@
         return svg.Replace(svg.Substring(svgTagStart, svgTagEnd - svgTagStart + 1), svgTag);
     }
 }
-
-@((MarkupString)SvgContent)
+<i @attributes="@CapturedAttributes">
+    @((MarkupString)SvgContent)
+</i>

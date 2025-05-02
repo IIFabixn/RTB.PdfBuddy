@@ -22,10 +22,10 @@
 
 <FlexLayout FullHeight IsVertical class="container self-center items-center gap-4">
     <FlexLayout IsVertical>
-        <h1 class="text-center text-2xl">Welcome to PdfBuddy!</h1>
-        <p class="text-caption">PdfBuddy is a simple PDF editor that allows you to manipulate PDF files with ease, just by drag and drop!</p>
+        <h1 class="text-center text-2xl text-black dark:text-white">Welcome to PdfBuddy!</h1>
+        <p class="text-caption text-black dark:text-white">PdfBuddy is a simple PDF editor that allows you to manipulate PDF files with ease, just by drag and drop!</p>
     </FlexLayout>
-    <FlexLayout IsVertical FullHeight class="w-full p-8 bg-zinc-950 rounded-t box-border">
+    <FlexLayout IsVertical FullHeight class="w-full p-8 bg-zinc-200 dark:bg-zinc-950 rounded-t box-border shadow">
         <Grid FullHeight Rows="2fr 1fr" Columns="1fr 1fr" class="gap-8">
             <GridItem ColumnSpan="2">
                 <FileDropInput Id="IndexFileDrop"
@@ -34,8 +34,8 @@
                     OnInput="ImportFiles"
                     class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
                     <FlexLayout IsVertical class="items-center gap-8">
-                        <Icon IconName="File" Height="72" Width="72" class="stroke-white fill-transparent" />
-                        <h2 class="text-center">Drag and drop your PDF files here or click to select files.</h2>
+                        <Icon IconName="File" Height="72" Width="72" class="stroke-black dark:stroke-white fill-transparent" />
+                        <h2 class="text-center text-black dark:text-zinc-500">Drag and drop your PDF files here or click to select files.</h2>
                     </FlexLayout>
                 </FileDropInput>
             </GridItem>
@@ -47,9 +47,9 @@
                     OnInput="MergeAll"
                     class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
                     <FlexLayout IsVertical class="items-center gap-4">
-                        <Icon IconName="Merge" Height="72" Width="72" class="stroke-white fill-transparent" />
-                        <h2>Merge Documents</h2>
-                        <p class="text-center text-zinc-500">Drag and drop your PDF files here or click to select files.</p>
+                        <Icon IconName="Merge" Height="72" Width="72" class="stroke-black dark:stroke-white fill-transparent" />
+                        <h2 class="text-black dark:text-white">Merge Documents</h2>
+                        <p class="text-center text-black dark:text-zinc-500">Drag and drop your PDF files here or click to select files.</p>
                     </FlexLayout>
                 </FileDropInput>
             </GridItem>
@@ -60,9 +60,9 @@
                     OnInput="SplitAll"
                     class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
                     <FlexLayout IsVertical class="items-center gap-4">
-                        <Icon IconName="Split" Height="72" Width="72" class="stroke-white fill-transparent" />
-                        <h2>Split Documents</h2>
-                        <p class="text-center text-zinc-500">Drag and drop your PDF files here or click to select files.</p>
+                        <Icon IconName="Split" Height="72" Width="72" class="stroke-black dark:stroke-white fill-transparent" />
+                        <h2 class="text-black dark:text-white">Split Documents</h2>
+                        <p class="text-center text-black dark:text-zinc-500">Drag and drop your PDF files here or click to select files.</p>
                     </FlexLayout>
                 </FileDropInput>
             </GridItem>
