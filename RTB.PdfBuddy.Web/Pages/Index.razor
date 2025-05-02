@@ -20,41 +20,49 @@
 
 @inherits RTBComponent
 
-<FlexLayout FullHeight IsVertical>
-    <FlexLayout FullHeight IsVertical class="gap-4 items-center">
-        <FlexLayout IsVertical>
-            <h1>Welcome to PdfBuddy!</h1>
-            <p class="text-caption">PdfBuddy is a simple PDF editor that allows you to manipulate PDF files with ease, just by drag and drop!</p>
+<FlexLayout FullHeight IsVertical class="items-center">
+    <h1 class="text-center">Welcome to PdfBuddy!</h1>
+    <p class="text-caption">PdfBuddy is a simple PDF editor that allows you to manipulate PDF files with ease, just by drag and drop!</p>
+    <FlexLayout FullHeight IsVertical class="container self-center gap-4 p-4 bg-zinc-900 rounded-t">
+        <FlexLayout FullHeight IsVertical>
             
             <FileDropInput Id="IndexFileDrop"
                 Multiple
                 AcceptedTypes="@(new[] { MediaTypeNames.Application.Pdf })"
                 OnInput="ImportFiles"
                 class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
-                <h2 class="text-center">Drag and drop your PDF files here or click to select files.</h2>
+                <FlexLayout IsVertical class="items-center">
+                    <Icon IconName="File" class="w-18 h-18 stroke-white" />
+                    <h2 class="text-center">Drag and drop your PDF files here or click to select files.</h2>
+                </FlexLayout>
             </FileDropInput>
         </FlexLayout>
 
-        <h2>Quick Features</h2>
-        <Grid FullHeight Columns="1fr 1fr" class="gap-4">
-            <GridItem class="h-full">
+        <Grid Columns="1fr 1fr" class="gap-4">
+            <GridItem>
                 <FileDropInput Id="MergeAllDrop"
                     Multiple
                     AcceptedTypes="@(new[] { MediaTypeNames.Application.Pdf })"
                     OnInput="MergeAll"
                     class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
-                    <h2>Merge Documents</h2>
-                    <p class="text-center text-zinc-500">Drag and drop your PDF files here or click to select files.</p>
+                    <FlexLayout IsVertical class="items-center">
+                        <Icon IconName="Merge" class="w-18 h-18 stroke-white" />
+                        <h2>Merge Documents</h2>
+                        <p class="text-center text-zinc-500">Drag and drop your PDF files here or click to select files.</p>
+                    </FlexLayout>
                 </FileDropInput>
             </GridItem>
-            <GridItem class="h-full">
+            <GridItem>
                 <FileDropInput Id="SplitAllDrop"
                     Multiple
                     AcceptedTypes="@(new[] { MediaTypeNames.Application.Pdf })"
                     OnInput="SplitAll"
                     class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
-                    <h2>Split Documents</h2>
-                    <p class="text-center text-zinc-500">Drag and drop your PDF files here or click to select files.</p>
+                    <FlexLayout IsVertical class="items-center">
+                        <Icon IconName="Split" class="w-18 h-18 stroke-white" />
+                        <h2>Split Documents</h2>
+                        <p class="text-center text-zinc-500">Drag and drop your PDF files here or click to select files.</p>
+                    </FlexLayout>
                 </FileDropInput>
             </GridItem>
         </Grid>

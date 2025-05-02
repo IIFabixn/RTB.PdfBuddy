@@ -2,43 +2,6 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "build web",
-      "command": "dotnet",
-      "type": "process",
-      "args": [
-        "build",
-        "${workspaceFolder}/RTB.PdfBuddy.Web/RTB.PdfBuddy.Web.csproj",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary"
-      ],
-      "problemMatcher": "$msCompile"
-    },
-    {
-      "label": "publish web",
-      "command": "dotnet",
-      "type": "process",
-      "args": [
-        "publish",
-        "${workspaceFolder}/RTB.PdfBuddy.Web/RTB.PdfBuddy.Web.csproj",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary"
-      ],
-      "problemMatcher": "$msCompile"
-    },
-    {
-      "label": "watch web",
-      "command": "dotnet",
-      "type": "process",
-      "args": [
-        "watch",
-        "run",
-        "${workspaceFolder}/RTB.PdfBuddy.Web/RTB.PdfBuddy.Web.csproj",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary"
-      ],
-      "problemMatcher": "$msCompile"
-    },
-    {
       "label": "Tailwind Watch",
       "type": "shell",
       "options": {
@@ -67,37 +30,19 @@
       }
     },
     {
-      "label": "Kill Port 5217",
+      "label": "Cleanup Debug",
       "type": "shell",
       "osx": {
-        "command": "lsof",
-        "args": [
-          "-iTCP",
-          "-sTCP:LISTEN",
-          "-P",
-          "|",
-          "grep",
-          ":5217",
-          "|",
-          "awk",
-          "{print $2}",
-          "|",
-          "xargs",
-          "kill",
-          "-9",
-        ],
-        "problemMatcher": []
+        "command": "lsof -ti :5217 | xargs kill -9; pkill -f dotnet;"
       },
+      "problemMatcher": [],
       "presentation": {
         "reveal": "always",
         "panel": "shared",
-        "echo": true
-      },
-      "group": {
-        "kind": "none",
-        "isDefault": false
-      },
-      "problemMatcher": []
-    }
-  ]
+        "clear": true,
+        "echo": true,
+        "close": true,
+      }
+    },
+  ],
 }

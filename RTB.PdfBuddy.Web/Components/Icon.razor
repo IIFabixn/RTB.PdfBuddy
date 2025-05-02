@@ -1,0 +1,37 @@
+﻿@inject HttpClient HttpClient
+
+@inherits RTBComponent
+
+@code {
+    [Parameter] public string IconName { get; set; } = "icon-id";
+    private string SvgContent { get; set; } = string.Empty;
+    private static readonly Dictionary<string, string> IconCache = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (string.IsNullOrEmpty(IconName))
+        {
+            return;
+        }
+
+        try
+        {
+            var svgPath = $"img/{IconName}.svg";
+            if (!IconCache.TryGetValue(svgPath, out var cachedSvg))
+            {
+                cachedSvg = await HttpClient.GetStringAsync(svgPath);
+                return;
+            }
+    
+            SvgContent = cachedSvg;
+        }
+        catch
+        {
+            SvgContent = "<!-- SVG not found -->";
+        }
+    }
+}
+
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    @((MarkupString)SvgContent)
+</svg>
