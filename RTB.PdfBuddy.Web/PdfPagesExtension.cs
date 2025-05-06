@@ -1,7 +1,7 @@
 ﻿using PdfSharpCore.Pdf;
 using System.Buffers.Text;
 
-namespace RTB.PdfBuddy.Shared
+namespace RTB.PdfBuddy.Web
 {
     public static class PdfPagesExtension
     {

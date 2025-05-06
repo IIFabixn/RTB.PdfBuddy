@@ -2,7 +2,7 @@ using System;
 using PdfSharpCore.Pdf;
 using PdfSharpCore.Pdf.IO;
 
-namespace RTB.PdfBuddy.Shared;
+namespace RTB.PdfBuddy.Web;
 
 public class PdfEditor()
 {
