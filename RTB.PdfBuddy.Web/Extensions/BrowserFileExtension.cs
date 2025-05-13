@@ -2,7 +2,7 @@ using System;
 using Microsoft.AspNetCore.Components.Forms;
 using PdfSharpCore.Pdf;
 using PdfSharpCore.Pdf.IO;
-using RTB.PdfBuddy.Shared;
+using RTB.PdfBuddy.Web;
 namespace RTB.PdfBuddy.Shared.Extensions;
 
 public static class BrowserFileExtension

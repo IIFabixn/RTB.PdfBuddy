@@ -30,6 +30,37 @@
       }
     },
     {
+      "label": "Build Web",
+      "options": {
+        "cwd": "${workspaceFolder}/RTB.PdfBuddy.Web"
+      },
+      "command": "dotnet",
+      "args": [
+        "build"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Start Debug",
+      "options": {
+        "cwd": "${workspaceFolder}/RTB.PdfBuddy.Web"
+      },
+      "command": "dotnet",
+      "args": [
+        "watch",
+        "run",
+        ".",
+        "--launch-profile",
+        "http"
+      ],
+      "problemMatcher": [],
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "Cleanup Debug",
+        "Build Web",
+      ]
+    },
+    {
       "label": "Cleanup Debug",
       "type": "shell",
       "osx": {
@@ -41,8 +72,8 @@
         "panel": "shared",
         "clear": true,
         "echo": true,
-        "close": true,
+        "close": true
       }
-    },
+    }
   ],
 }
