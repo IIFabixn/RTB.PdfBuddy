@@ -78,7 +78,7 @@
         <FlexLayout IsHorizontal class="gap-2 items-center">
             <DropZone class="grow" TObject="PdfPage[]" OnObjectDropped="@(pages => StateAction(() => PdfEditor.MovePagesToNewFile(pages)))">
                 <FileDropInput Id="EditorNewDocumentDropArea" Multiple OnInput="FileAdded"
-                AcceptedTypes="@(new[] { MediaTypeNames.Application.Pdf })">
+                    AcceptedTypes="@(new[] { MediaTypeNames.Application.Pdf })">
                     <div class="border rounded min-h-18 flex flex-col p-2 justify-center text-gray-400 text-sm">
                         <p class="max-w-lg">
                             Create New Document by dragging pages of existing files into here or

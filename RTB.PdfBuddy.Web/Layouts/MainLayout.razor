@@ -1,5 +1,4 @@
 ﻿@using RTB.BlazorUI.Services.BusyTracker
-@using RTB.BlazorUI.Services.Layout
 @using Microsoft.AspNetCore.Components.Sections
 
 @inherits LayoutComponentBase
@@ -30,9 +29,6 @@
                 {
                     <div class="animate-spin inline text-red-400">.</div>
                 }
-                <li>
-                    <ThemeSwitcher />
-                </li>
                 <li class="hover:text-slate-400">
                     <NavLink href="infos" title="Impressum and more">
                         <Icon IconName="Info" class="text-black dark:text-white" title="Soure Code" />
