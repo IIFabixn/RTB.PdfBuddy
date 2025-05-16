@@ -8,25 +8,24 @@
 @inject IJSRuntime JSRuntime
 @inject IBusyTracker BusyTracker
 
-@inherits RTBComponent
+@inherits BusyComponent
 
 @code {
     [Parameter] public PdfPage? Page { get; set; }
 }
 
-<div class="h-full w-full @(thumbnail is null ? "animate-pulse" : string.Empty) @(CapturedAttributes.TryGetValue("class", out var classes) ? classes : string.Empty)"
+<div id="@_guid" class="h-full w-full @(thumbnail is null ? "animate-pulse" : string.Empty) @(CapturedAttributes.TryGetValue("class", out var classes) ? classes : string.Empty)"
     @attributes="@(CapturedAttributes.Without("class"))">
     <img class="w-auto h-full object-contain object-center" src="@thumbnail" alt="@(Page?.Owner.Info.Title ?? "Pdf view")" title="@(Page?.Owner.Info.Title)" />
 </div>
 
 @code 
 {
-    private static readonly SemaphoreSlim thumbnailSemaphore = new(8);
+    private Guid _guid = Guid.CreateVersion7();
     private static readonly ConcurrentDictionary<string, string> ThumbnailCache = new();
-
     private string? thumbnail;
-
     private string? currentPageId;
+    private IDisposable? busyToken;
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
@@ -46,7 +45,9 @@
                 return Task.CompletedTask;
             }
 
-            _ = GenerateThumbnail(key);
+            Console.WriteLine($"Generate for: {key}");
+
+            return GenerateThumbnail(key);
         }
         
         return Task.CompletedTask;
@@ -56,17 +57,16 @@
     {
         if (Page is null) return;
 
-        await thumbnailSemaphore.WaitAsync();
-        using var busy = BusyTracker.Track($"LoadPdfView.{key}");
+        busyToken?.Dispose();
+        busyToken = TrackBusy($"LoadPdfView.{key}");
         var bytes = await Task.Run(Page.ExtractPageAsBytes);
-        await RenderPageThumbnail(key, bytes);
+        await RenderPageThumbnail(key, bytes).ConfigureAwait(false);
     }
 
     private async Task RenderPageThumbnail(string key, byte[] pdfBytes)
     {
         thumbnail = await JSRuntime.InvokeAsync<string>("pdfRenderer.renderPageThumbnail", new object[] { pdfBytes });
         ThumbnailCache[key] = thumbnail;
-        thumbnailSemaphore.Release();
-        StateHasChanged();
+        busyToken?.Dispose();
     }
 }
