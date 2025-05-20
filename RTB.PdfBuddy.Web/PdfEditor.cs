@@ -178,6 +178,8 @@ public class PdfEditor()
     {
         if (!Files.Contains(doc)) return;
         Files.Remove(doc);
+        doc.Dispose();
+        Console.WriteLine($"File removed: {doc}");
     }
 
     public void OnFileNameChange(PdfDocument file,string newName)

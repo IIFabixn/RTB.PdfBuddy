@@ -21,8 +21,13 @@
 
 @code 
 {
-    private Guid _guid = Guid.CreateVersion7();
     private static readonly ConcurrentDictionary<string, string> ThumbnailCache = new();
+    public static bool RemoveThumbnail(string key)
+    {
+        return ThumbnailCache.TryRemove(key, out _);
+    }
+    
+    private Guid _guid = Guid.CreateVersion7();
     private string? thumbnail;
     private string? currentPageId;
     private IDisposable? busyToken;

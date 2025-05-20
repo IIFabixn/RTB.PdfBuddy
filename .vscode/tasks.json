@@ -64,7 +64,7 @@
       "label": "Cleanup Debug",
       "type": "shell",
       "osx": {
-        "command": "lsof -ti :5217 | xargs kill -9; pkill -f dotnet;"
+        "command": "sudo lsof -ti :5217 | xargs kill -9; pkill -f dotnet;"
       },
       "problemMatcher": [],
       "presentation": {
