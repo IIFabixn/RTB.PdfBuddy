@@ -6,9 +6,9 @@
 @using static RTB.BlazorUI.Services.BusyTracker.BusyTracker
 
 @inject IJSRuntime JSRuntime
-@inject IBusyTracker BusyTracker
+@inject IBusyTracker Busy
 
-@inherits BusyComponent
+@inherits RTBComponent
 
 @code {
     [Parameter] public PdfPage? Page { get; set; }
@@ -63,7 +63,7 @@
         if (Page is null) return;
 
         busyToken?.Dispose();
-        busyToken = TrackBusy($"LoadPdfView.{key}");
+        busyToken = Busy.Track($"LoadPdfView.{key}");
         var bytes = await Task.Run(Page.ExtractPageAsBytes);
         await RenderPageThumbnail(key, bytes).ConfigureAwait(false);
     }

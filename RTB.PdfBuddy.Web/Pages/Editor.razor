@@ -26,51 +26,47 @@
 <Grid FullHeight Rows="1fr auto" class="container self-center gap-4 p-8 bg-zinc-200 dark:bg-zinc-800 rounded-t box-border shadow">
     <GridItem Row="1" class="min-w-0 min-h-0 overflow-auto">
         <CollectionList IsVertical FullHeight Items="@PdfEditor.Files" TItem="PdfDocument" Context="file" class="gap-4">
-            <ItemTemplate>
-                <FlexLayout IsVertical class="gap-2">
-                    <FlexLayout IsHorizontal class="gap-2 items-center">
-                        <button class="text-red-300 px-0.5 self-end cursor-pointer" @onclick="() => RemoveFile(file)">x</button>
-                        <div class="grow overflow-auto">
-                            <input type="text"
-                                class="border-b min-w-xs outline-none px-1 self-start max-w-full text-black"
-                                placeholder="File name"
-                                style="field-sizing: content;"
-                                @bind-value="file.Info.Title"
-                                @bind-value:event="oninput"
-                                @onchange="@((e) => StateAction(() => PdfEditor.OnFileNameChange(file, e.Value?.ToString() ?? string.Empty)))" />
-                        </div>
-                        <button class="justify-self-end" @onclick="() => Save(file)">Save</button>
-                    </FlexLayout>
-                    <FlexLayout IsHorizontal class="gap-1 overflow-auto scrollbar">
-                        <FlexLayout IsVertical class="justify-around shrink-0">
-                            <DraggableItem TData="PdfPage[]" ItemData="@file.GetPagesAsArray()"> 
-                                <Icon IconName="Drag" Width="24" Height="24" class="text-black" />
-                            </DraggableItem>
-                        </FlexLayout>
-                        <CollectionList IsHorizontal Items="@file.GetPagesAsArray().ToList()" Context="capturedPage" TItem="PdfPage" class="gap-2">
-                            <ItemTemplate>
-                                <DropZone class="h-full min-w-2 rounded" DraggingClass="bg-blue-100" TObject="PdfPage[]" OnObjectDropped="pages => StateAction(() => PdfEditor.MovePageToFileAtIndex(file, file.GetPageIndex(capturedPage), pages))" />
-
-                                <DraggableItem TData="PdfPage[]" ItemData="@(SelectedPages.Contains(capturedPage) ? SelectedPages.ToArray() : new[] { capturedPage })">
-                                    <FlexLayout @onclick="() => ToggleSelection(capturedPage)" IsVertical class="@($"{(SelectedPages.Contains(capturedPage) ? "border-red-400" : "border-white")} group h-24 text-xs border-2 rounded-tr flex flex-col justify-center w-16 overflow-clip relative")">
-                                        <div class="absolute top-1 right-1 collapse group-hover:visible">
-                                            <button type="button" class="w-4 rounded h-4 bg-white shadow text-red-400 grid content-center leading-0 align-middle" @onclick="@(() => StateAction(() => PdfEditor.RemovePageFromFile(file, capturedPage)))">
-                                                x
-                                            </button>
-                                            <button type="button" class="w-4 rounded h-4 bg-white shadow text-red-400 grid content-center leading-0 align-middle" @onclick="() => ShowFullscren(capturedPage)">
-                                                O
-                                            </button>
-                                        </div>
-                                        <PdfViewer Page="capturedPage" class="border" />
-                                    </FlexLayout>
-                                </DraggableItem>
-                            </ItemTemplate>
-                        </CollectionList>
-                        <!-- Drop after the last page -->
-                        <DropZone class="h-full min-w-2 grow" TObject="PdfPage[]" OnObjectDropped="(page) => StateAction(() => PdfEditor.MovePageToFileAtIndex(file, file.PageCount - 1, page))" />
-                    </FlexLayout>
+            <FlexLayout IsVertical class="gap-2">
+                <FlexLayout IsHorizontal class="gap-2 items-center">
+                    <button class="text-red-300 px-0.5 self-end cursor-pointer" @onclick="() => RemoveFile(file)">x</button>
+                    <div class="grow overflow-auto">
+                        <input type="text"
+                            class="border-b min-w-xs outline-none px-1 self-start max-w-full text-black"
+                            placeholder="File name"
+                            style="field-sizing: content;"
+                            @bind-value="file.Info.Title"
+                            @bind-value:event="oninput"
+                            @onchange="@((e) => StateAction(() => PdfEditor.OnFileNameChange(file, e.Value?.ToString() ?? string.Empty)))" />
+                    </div>
+                    <button class="justify-self-end" @onclick="() => Save(file)">Save</button>
                 </FlexLayout>
-            </ItemTemplate>
+                <FlexLayout IsHorizontal class="gap-1 overflow-auto scrollbar">
+                    <FlexLayout IsVertical class="justify-around shrink-0">
+                        <DraggableItem TData="PdfPage[]" ItemData="@file.GetPagesAsArray()"> 
+                            <Icon IconName="Drag" Width="24" Height="24" class="text-black" />
+                        </DraggableItem>
+                    </FlexLayout>
+                    <CollectionList IsHorizontal Items="@file.GetPagesAsArray().ToList()" Context="capturedPage" TItem="PdfPage" class="gap-2">
+                        <DropZone class="h-full min-w-2 rounded" DraggingClass="bg-blue-100" TObject="PdfPage[]" OnObjectDropped="pages => StateAction(() => PdfEditor.MovePageToFileAtIndex(file, file.GetPageIndex(capturedPage), pages))" />
+
+                        <DraggableItem TData="PdfPage[]" ItemData="@(SelectedPages.Contains(capturedPage) ? SelectedPages.ToArray() : new[] { capturedPage })">
+                            <FlexLayout @onclick="() => ToggleSelection(capturedPage)" IsVertical class="@($"{(SelectedPages.Contains(capturedPage) ? "border-red-400" : "border-white")} group h-24 text-xs border-2 rounded-tr flex flex-col justify-center w-16 overflow-clip relative")">
+                                <div class="absolute top-1 right-1 collapse group-hover:visible">
+                                    <button type="button" class="w-4 rounded h-4 bg-white shadow text-red-400 grid content-center leading-0 align-middle" @onclick="@(() => StateAction(() => PdfEditor.RemovePageFromFile(file, capturedPage)))">
+                                        x
+                                    </button>
+                                    <button type="button" class="w-4 rounded h-4 bg-white shadow text-red-400 grid content-center leading-0 align-middle" @onclick="() => ShowFullscren(capturedPage)">
+                                        O
+                                    </button>
+                                </div>
+                                <PdfViewer Page="capturedPage" class="border" />
+                            </FlexLayout>
+                        </DraggableItem>
+                    </CollectionList>
+                    <!-- Drop after the last page -->
+                    <DropZone class="h-full min-w-2 grow" TObject="PdfPage[]" OnObjectDropped="(page) => StateAction(() => PdfEditor.MovePageToFileAtIndex(file, file.PageCount - 1, page))" />
+                </FlexLayout>
+            </FlexLayout>
         </CollectionList>
     </GridItem>
     <GridItem Row="2">

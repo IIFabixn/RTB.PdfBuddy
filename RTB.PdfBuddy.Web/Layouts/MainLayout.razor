@@ -1,21 +1,31 @@
 ﻿@using RTB.BlazorUI.Services.BusyTracker
 @using Microsoft.AspNetCore.Components.Sections
+@using RTB.PdfBuddy.Web.Theme
 
 @inherits LayoutComponentBase
 
 @inject IBusyTracker BusyTracker
 
 @code {
+    [CascadingParameter] public IBuddyTheme Theme { get; set; } = default!;
+
     internal static object TopbarSection = new();
 
     protected override void OnInitialized()
     {
         BusyTracker.OnBusyChanged += StateHasChanged;
     }
+
+    private string? LayoutClass { get; set; }
 }
 
+<Styled @bind-Classname="LayoutClass">
+    background-color: @(Theme.Background);
+    color: @(Theme.PrimaryText);
+</Styled>
+
 <CascadingValue Value="this">
-    <FlexLayout IsVertical FullHeight class="page flex flex-col bg-zinc-50 dark:bg-zinc-900 text-white">
+    <FlexLayout IsVertical FullHeight class="@LayoutClass">
         <nav class="flex flex-row justify-between p-4 container self-center items-center">
             <NavLink href="">
                 <FlexLayout IsHorizontal class="items-center">
@@ -48,4 +58,8 @@
             @Body
         </div>
     </FlexLayout>
-</CascadingValue>
+</CascadingValue>    using RTB.PdfBuddy.Web.Theme;
+
+#line default
+#line hidden
+#nullable disable
