@@ -13,4 +13,6 @@ public class DarkBuddyTheme : IBuddyTheme
     public string PrimaryText => "#ffffff";
 
     public string TextOnPrimary => "#ffffff";
+
+    public string Name => "Dark";
 }

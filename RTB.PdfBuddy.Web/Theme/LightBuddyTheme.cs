@@ -13,4 +13,6 @@ public class LightBuddyTheme : IBuddyTheme
     public string PrimaryText => "#212529";
 
     public string TextOnPrimary => "#ffffff";
+
+    public string Name => "Light";
 }

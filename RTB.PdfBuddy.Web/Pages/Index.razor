@@ -11,6 +11,7 @@
 @using System.Net.Mime
 @using System.IO.Compression
 @using RTB.PdfBuddy.Shared.Extensions
+@using RTB.PdfBuddy.Web.Theme
 
 @inject IJSRuntime JSRuntime
 @inject IBusyTracker BusyTracker
@@ -20,9 +21,16 @@
 
 @inherits RTBComponent
 
+@code {
+    [CascadingParameter] protected IBuddyTheme Theme { get; set; } = default!;
+}
+
 <FlexLayout FullHeight IsVertical class="container mx-auto gap-4">
     <FlexLayout IsVertical class="gap-2">
-        <h1 class="text-center text-2xl text-black">Welcome to PdfBuddy!</h1>
+        <Text Element="h1" Color="@Theme.PrimaryText">
+            Welcome to PdfBuddy!
+        </Text>
+        <h1 class="text-center text-2xl text-black"></h1>
         <p class="text-caption text-black">PdfBuddy is a simple PDF editor that allows you to manipulate PDF files with ease, just by drag and drop!</p>
     </FlexLayout>
     <Grid FullHeight Rows="2fr 1fr" Columns="1fr 1fr" class="w-full min-h-0 overflow-auto p-8 bg-zinc-200 dark:bg-zinc-800 rounded-t box-border shadow gap-8">
@@ -30,8 +38,7 @@
             <FileDropInput Id="IndexFileDrop"
                 Multiple
                 AcceptedTypes="@(new[] { MediaTypeNames.Application.Pdf })"
-                OnInput="ImportFiles"
-                class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
+                OnInput="ImportFiles" class="h-full rounded flex flex-col justify-center p-4 border-2 border-white">
                 <FlexLayout IsVertical class="items-center gap-8">
                     <Icon IconName="File" Height="72" Width="72" class="stroke-black fill-transparent" />
                     <h2 class="text-center text-black">Drag and drop your PDF files here or click to select files.</h2>
@@ -116,7 +123,6 @@
     private async Task SplitAll(params IBrowserFile[] files)
     {
         if (files.Length == 0) return;
-
         using var busy = BusyTracker.Track("SplittingAll");
         var documents = await ReadDocuments(files);
         PdfEditor.AddFileRange(documents);

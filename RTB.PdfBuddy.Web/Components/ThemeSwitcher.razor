@@ -1,0 +1,16 @@
+﻿@using RTB.BlazorUI.Services.Theme
+@using RTB.PdfBuddy.Web.Theme
+@inject IThemeService<IBuddyTheme> ThemeService
+    
+@code {   
+    [CascadingParameter] protected IBuddyTheme Theme { get; set; } = default!;
+}
+
+@if (Theme is LightBuddyTheme)
+{
+    <Icon IconName="Moon" @onclick="@(() => ThemeService.SetTheme(new DarkBuddyTheme()))" />
+}
+@if (Theme is DarkBuddyTheme)
+{
+    <Icon IconName="Sun" @onclick="@(() => ThemeService.SetTheme(new LightBuddyTheme()))"/>
+}
